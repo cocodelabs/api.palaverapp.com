@@ -4,3 +4,4 @@ python:
 script: nosetests -s palaverapi
 install:
  - pip install nose --use-mirrors
+ - pip install -r requirements.txt
