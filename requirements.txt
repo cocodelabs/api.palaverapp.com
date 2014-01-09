@@ -1,0 +1,3 @@
+gunicorn==18.0
+peewee==2.1.7
+-e git+https://github.com/kylef/rivr.git@0d9ca5877a0b29ffb6ddd2117b8bfe521247737a#egg=rivr-master
