@@ -1,0 +1,42 @@
+FORMAT: 1A
+HOST: https://api.palaverapp.com/
+
+# Palaver
+
+# Group Devices
+
+## Devices [/1/devices]
+
+### Register a new device [POST]
+
++ Request (application/json)
+
+        { "device_token": "1AB23ORM" }
+        
++ Response 201 (application/json)
+
+        {
+            "device_token": "1AB231AB23ORMORM",
+            "push_token": "1AB23ORM1AB23ORM1AB23ORM"
+        }
+
+## Notifications [/1/push]
+
+### Send a new notification [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: token 1AB23ORM1AB23ORM1AB23ORM
+            
+    + Body
+        
+            {
+                "message": "Hello world!",
+                "sender": "kylef",
+                "channel": "#palaver",
+                "badge": 1
+            }
+
++ Response 204
