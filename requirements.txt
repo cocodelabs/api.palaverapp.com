@@ -1,3 +1,8 @@
 gunicorn==18.0
+invoke==0.9.0
 peewee==2.1.7
--e git+https://github.com/kylef/rivr.git@0d9ca5877a0b29ffb6ddd2117b8bfe521247737a#egg=rivr-master
+postgres==2.1.2
+psycopg2==2.5.3
+pw-database-url==0.2.0
+-e git+https://github.com/kylef/rivr.git@0d9ca5877a0b29ffb6ddd2117b8bfe521247737a#egg=rivr-dev
+wsgiref==0.1.2

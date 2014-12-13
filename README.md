@@ -23,7 +23,7 @@ Available under the [BSD license](LICENSE).
 ### Running tests
 
 ```shell
-$ python -m unittest discover
+$ invoke tests
 ```
 
 ### Running the server
