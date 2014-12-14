@@ -29,13 +29,8 @@ class ViewTests(unittest.TestCase):
         response = self.client.post('/1/push', {})
         self.assertEqual(response.status_code, 401)
 
-    def test_push_401_invalid_token(self):
-        headers = { 'Authorization': 'token invalid' }
-        response = self.client.post('/1/push', {}, headers)
-        self.assertEqual(response.status_code, 401)
-
     def test_push(self):
-        device = Device.create(apns_token='apns')
+        device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
         token = Token.create(device=device, token='valid', scope=Token.ALL_SCOPE)
 
         headers = { 'AUTHORIZATION': 'token valid' }
