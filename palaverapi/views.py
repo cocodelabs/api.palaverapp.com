@@ -32,3 +32,33 @@ class RegisterView(RESTView):
 
 router.register(r'^1/devices$', RegisterView.as_view())
 
+
+class PushView(RESTView):
+    def get_token(self):
+        authorization = self.request.headers.get('AUTHORIZATION', None)
+        if not authorization:
+            return
+
+        if authorization:
+            _, access_token = authorization.split(' ', 2)
+
+        try:
+            token = Token.get(token=access_token)
+        except Token.DoesNotExist:
+            token = None
+
+        return token
+
+    def post(self, request):
+        token = self.get_token()
+        if not token:
+            return Response(status=401)
+
+        message = request.POST.get('message', None)
+        sender = request.POST.get('sender', None)
+        channel = request.POST.get('channel', None)
+        network = request.POST.get('network', None)
+        badge = int(request.POST.get('badge', 1))
+
+router.register(r'^1/push$', PushView.as_view())
+
