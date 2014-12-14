@@ -5,6 +5,7 @@ from rivr.http import Response, RESTResponse
 from rivr.views import RESTView
 
 from palaverapi.models import database, Device, Token
+from palaverapi.utils import send_notification
 
 
 router = Router()
@@ -59,6 +60,7 @@ class PushView(RESTView):
         channel = request.POST.get('channel', None)
         network = request.POST.get('network', None)
         badge = int(request.POST.get('badge', 1))
+        success = send_notification(token.device.apns_token, message, sender, channel, badge, network)
 
 router.register(r'^1/push$', PushView.as_view())
 
