@@ -5,9 +5,9 @@ from logging.handlers import SMTPHandler
 from rivr.wsgi import WSGIHandler
 from palaverapi.views import app
 
+logger = logging.getLogger('rivr.request')
 
 if os.environ.get('SENDGRID_USERNAME'):
-    logger = logging.getLogger('rivr.request')
     mail_handler = SMTPHandler('smtp.sendgrid.net',
                                'support@palaverapp.com',
                                ['support@palaverapp.com'],
@@ -26,6 +26,10 @@ Time:               %(asctime)s
 Message:
 
 %(message)s"""))
+else:
+    console = logging.StreamHandler()
+    console.setLevel(logging.ERROR)
+    logger.addHandler(console)
 
 
 wsgi = WSGIHandler(app)
