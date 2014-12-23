@@ -3,7 +3,7 @@ import logging
 from logging.handlers import SMTPHandler
 
 from rivr.wsgi import WSGIHandler
-from palaverapi.views import router
+from palaverapi.views import app
 
 
 if os.environ.get('SENDGRID_USERNAME'):
@@ -28,5 +28,5 @@ Message:
 %(message)s"""))
 
 
-wsgi = WSGIHandler(router)
+wsgi = WSGIHandler(app)
 

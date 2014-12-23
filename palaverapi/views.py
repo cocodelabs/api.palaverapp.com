@@ -9,6 +9,7 @@ from palaverapi.utils import send_notification
 
 
 router = Router()
+app = database(router)
 
 @router.register(r'^$')
 def status(request):

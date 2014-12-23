@@ -4,6 +4,6 @@ invoke==0.9.0
 peewee==2.1.7
 postgres==2.1.2
 psycopg2==2.5.3
-pw-database-url==0.2.0
 -e git+https://github.com/kylef/rivr@b6f05a848ca85ccc2beee65d55aeb03b619bdc40#egg=rivr-master
+rivr-peewee==0.1.2
 wsgiref==0.1.2
