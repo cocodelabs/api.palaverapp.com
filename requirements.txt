@@ -1,9 +1,9 @@
 -e git+https://github.com/djacobs/PyAPNs@5bebbe33febfba72fb88d2f205675087ecc2ae0b#egg=apns-master
 gunicorn==18.0
 invoke==0.9.0
-peewee==2.1.7
+peewee==2.4.5
 postgres==2.1.2
 psycopg2==2.5.3
--e git+https://github.com/kylef/rivr@b6f05a848ca85ccc2beee65d55aeb03b619bdc40#egg=rivr-master
+rivr==0.5.1
 rivr-peewee==0.1.2
 wsgiref==0.1.2
