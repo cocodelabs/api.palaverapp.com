@@ -56,6 +56,11 @@ class PushView(RESTView):
         if not token:
             return Response(status=401)
 
+        try:
+            request.POST
+        except UnicodeDecodeError:
+            return Response(status=400)
+
         message = request.POST.get('message', None)
         sender = request.POST.get('sender', None)
         channel = request.POST.get('channel', None)
