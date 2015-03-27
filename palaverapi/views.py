@@ -3,6 +3,7 @@ import os
 
 import redis
 from rq import Queue
+import peewee
 
 from rivr.router import Router
 from rivr.http import Response, RESTResponse
@@ -29,16 +30,28 @@ class RegisterView(RESTView):
     def post(self, request):
         apns_token = request.POST['device_token']
         push_token = hashlib.sha1(hashlib.sha1(apns_token + apns_token).hexdigest()).hexdigest()
+        status = 200
 
-        with database.transaction():
+        try:
             device = Device.create(apns_token=apns_token)
+            status = 201
+        except peewee.IntegrityError:
+            device = Device.get(apns_token=apns_token)
+
+        try:
             token = Token.create(device=device, token=apns_token, scope=Token.ALL_SCOPE)
+        except peewee.IntegrityError:
+            token = Token.get(device=device, token=apns_token)
+
+        try:
             push = Token.create(device=device, token=push_token, scope=Token.PUSH_SCOPE)
+        except peewee.IntegrityError:
+            push = Token.get(device=device, token=push_token)
 
         return RESTResponse(request, {
             'device_token': apns_token,
             'push_token': push_token,
-        }, status=201)
+        }, status=status)
 
 
 router.register(r'^1/devices$', RegisterView.as_view())

@@ -14,6 +14,22 @@ class ViewTests(unittest.TestCase):
 
     def test_register(self):
         response = self.client.post('/1/devices', {'device_token': 'test_token'})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.content, '{"device_token": "test_token", "push_token": "ec1752bd70320e4763f7165d73e2636cca9e25cf"}')
+
+        device = Device.get(apns_token='test_token')
+        assert device
+
+        push_token = Token.select().where(Token.device == device, Token.token == 'ec1752bd70320e4763f7165d73e2636cca9e25cf')
+        token = Token.select().where(Token.device == device, Token.token == 'test_token')
+        assert token.get()
+        assert push_token.get()
+
+    def test_returns_200_when_re_registering(self):
+        response = self.client.post('/1/devices', {'device_token': 'test_token'})
+        response = self.client.post('/1/devices', {'device_token': 'test_token'})
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.content, '{"device_token": "test_token", "push_token": "ec1752bd70320e4763f7165d73e2636cca9e25cf"}')
 
