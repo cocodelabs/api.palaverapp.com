@@ -1,4 +1,8 @@
 import hashlib
+import os
+
+import redis
+from rq import Queue
 
 from rivr.router import Router
 from rivr.http import Response, RESTResponse
@@ -10,6 +14,11 @@ from palaverapi.utils import send_notification
 
 router = Router()
 app = database(router)
+
+redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+redis = redis.from_url(redis_url)
+queue = Queue(connection=redis)
+
 
 @router.register(r'^$')
 def status(request):
@@ -66,7 +75,8 @@ class PushView(RESTView):
         channel = request.POST.get('channel', None)
         network = request.POST.get('network', None)
         badge = int(request.POST.get('badge', 1))
-        success = send_notification(token.device.apns_token, message, sender, channel, badge, network)
+        queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network)
+        return Response(status=202)
 
 router.register(r'^1/push$', PushView.as_view())
 

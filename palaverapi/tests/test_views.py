@@ -35,5 +35,5 @@ class ViewTests(unittest.TestCase):
 
         headers = { 'AUTHORIZATION': 'token valid' }
         response = self.client.post('/1/push', {}, headers)
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 202)
 

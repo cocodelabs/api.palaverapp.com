@@ -1,1 +1,1 @@
-web: gunicorn -w 6 palaverapi:wsgi
+web: gunicorn -c gunicorn.py palaverapi:wsgi
