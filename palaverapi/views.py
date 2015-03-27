@@ -33,18 +33,21 @@ class RegisterView(RESTView):
         status = 200
 
         try:
-            device = Device.create(apns_token=apns_token)
+            with database.transaction():
+                device = Device.create(apns_token=apns_token)
             status = 201
         except peewee.IntegrityError:
             device = Device.get(apns_token=apns_token)
 
         try:
-            token = Token.create(device=device, token=apns_token, scope=Token.ALL_SCOPE)
+            with database.transaction():
+                token = Token.create(device=device, token=apns_token, scope=Token.ALL_SCOPE)
         except peewee.IntegrityError:
             token = Token.get(device=device, token=apns_token)
 
         try:
-            push = Token.create(device=device, token=push_token, scope=Token.PUSH_SCOPE)
+            with database.transaction():
+                push = Token.create(device=device, token=push_token, scope=Token.PUSH_SCOPE)
         except peewee.IntegrityError:
             push = Token.get(device=device, token=push_token)
 
