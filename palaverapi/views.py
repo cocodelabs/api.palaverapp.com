@@ -78,19 +78,19 @@ class PushView(RESTView):
 
     def post(self, request):
         try:
-            request.POST
-        except UnicodeDecodeError:
+            attributes = request.POST
+        except UnicodeDecodeError, ValueError:
             return Response(status=400)
 
         token = self.get_token()
         if not token:
             return Response(status=401)
 
-        message = request.POST.get('message', None)
-        sender = request.POST.get('sender', None)
-        channel = request.POST.get('channel', None)
-        network = request.POST.get('network', None)
-        badge = int(request.POST.get('badge', 1))
+        message = attributes.get('message', None)
+        sender = attributes.get('sender', None)
+        channel = attributes.get('channel', None)
+        network = attributes.get('network', None)
+        badge = int(attributes.get('badge', 1))
         queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network)
         return Response(status=202)
 
