@@ -16,7 +16,7 @@ from palaverapi.utils import send_notification
 router = Router()
 app = router
 
-redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+redis_url = os.getenv('REDISCLOUD_URL', 'redis://localhost:6379')
 redis = redis.from_url(redis_url)
 queue = Queue(connection=redis)
 
