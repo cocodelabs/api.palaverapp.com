@@ -8,5 +8,5 @@ psycopg2==2.5.3
 redis==2.10.3
 rivr==0.6.0
 rivr-peewee==0.2.0
--e git+https://github.com/selwin/rq@c3767e28e2ca43a6aad93e6947f00f205c431b5a#egg=rq-origin/registry-maintenance
+-e git+https://github.com/selwin/rq@registry-maintenance#egg=rq-registry-maintenance
 wsgiref==0.1.2
