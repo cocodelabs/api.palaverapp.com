@@ -2,7 +2,7 @@
 click==3.3
 gunicorn==18.0
 invoke==0.9.0
-peewee==2.5.0
+peewee==2.6.1
 postgres==2.1.2
 psycopg2==2.5.3
 redis==2.10.3
