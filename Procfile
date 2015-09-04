@@ -1,1 +1,2 @@
-web: gunicorn -c gunicorn_config.py palaverapi:wsgi
+web: gunicorn -w 3 palaverapi:wsgi
+worker: rqworker -u $REDISTOGO_URL
