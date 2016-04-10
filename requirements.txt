@@ -1,4 +1,4 @@
--e git+https://github.com/djacobs/PyAPNs@5bebbe33febfba72fb88d2f205675087ecc2ae0b#egg=apns-dev
+apns==2.0.1
 click==3.3
 gunicorn==18.0
 invoke==0.9.0
