@@ -9,6 +9,7 @@ psycopg2==2.5.3
 redis==2.10.3
 rivr==0.6.0
 rivr-peewee==0.2.0
--e git+https://github.com/nvie/rq@7050549d918e914466d5fe41499fd9911d037a4a#egg=rq-dev
+rq==0.6.0
 six==1.10.0
 WebOb==1.6.1
+wheel==0.24.0
