@@ -79,7 +79,7 @@ class PushView(RESTView):
     def post(self, request):
         try:
             attributes = request.POST
-        except UnicodeDecodeError, ValueError:
+        except (UnicodeDecodeError, ValueError):
             return Response(status=400)
 
         message = attributes.get('message', None)
