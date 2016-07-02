@@ -4,14 +4,18 @@ from apns import APNs, Payload, MAX_PAYLOAD_LENGTH
 
 DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates'))
 
-def send_notification(apns_token, message, sender, channel, badge=1, network=None):
+def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None):
     apns = APNs(cert_file=os.path.join(DIRECTORY, 'public.pem'),
                 key_file=os.path.join(DIRECTORY, 'private.pem'))
 
     query = None
 
     if sender and message:
-        message = '<%s> %s' % (sender, message)
+        if intent == 'ACTION':
+            message = '* %s %s' % (sender, message)
+        else:
+            message = '<%s> %s' % (sender, message)
+
         query = sender
 
     if channel and message:
