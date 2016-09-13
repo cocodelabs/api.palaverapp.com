@@ -25,6 +25,10 @@ queue = Queue(connection=redis)
 def status(request):
     return Response(status=204)
 
+@router.register(r'^500$')
+def crash(request):
+    raise RuntimeError("You are eaten by a grue")
+
 
 class RegisterView(RESTView):
     def post(self, request):

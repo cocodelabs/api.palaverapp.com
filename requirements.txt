@@ -1,5 +1,5 @@
 apns==2.0.1
-bugsnag==2.4.0
+bugsnag==3.0.0b1
 click==3.3
 gunicorn==18.0
 invoke==0.9.0

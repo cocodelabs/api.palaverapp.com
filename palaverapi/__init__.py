@@ -8,8 +8,9 @@ from palaverapi.views import app
 logger = logging.getLogger('rivr.request')
 
 if os.environ.get('BUGSNAG_API_KEY'):
-    from bugsnag.handlers import BugsnagHandler
-    handler = BugsnagHandler()
+    from bugsnag import Client
+    client = Client()
+    handler = client.log_handler()
     handler.setLevel(logging.ERROR)
     logger.addHandler(handler)
 else:
