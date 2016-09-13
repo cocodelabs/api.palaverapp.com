@@ -1,9 +1,11 @@
 import os
 from apns import APNs, Payload, MAX_PAYLOAD_LENGTH
-
+from bugsnag import Client
 
 DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates'))
+client = Client(asynchronous=False, install_sys_hook=False)
 
+@client.capture
 def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None):
     apns = APNs(cert_file=os.path.join(DIRECTORY, 'public.pem'),
                 key_file=os.path.join(DIRECTORY, 'private.pem'))
