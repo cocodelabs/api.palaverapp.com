@@ -6,30 +6,25 @@ DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file_
 client = Client(asynchronous=False, install_sys_hook=False)
 
 @client.capture
-def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None):
+def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None, private=False):
     apns = APNs(cert_file=os.path.join(DIRECTORY, 'public.pem'),
                 key_file=os.path.join(DIRECTORY, 'private.pem'))
 
     query = None
 
-    if sender and message:
-        if intent == 'ACTION':
-            message = '* %s %s' % (sender, message)
-        else:
-            message = '<%s> %s' % (sender, message)
-
+    if channel:
+        query = channel
+    elif sender:
         query = sender
 
-    if channel and message:
-        message = '%s %s' % (channel, message)
-        query = channel
+    if message and intent == 'ACTION':
+        message = '* %s' % (message)
 
     sound = None
-    alert = None
+    alert = {}
 
-    if message:
+    if message or private:
         sound = 'default'
-        alert = '.'
 
     user_info = {}
 
@@ -37,12 +32,19 @@ def send_notification(apns_token, message, sender, channel, badge=1, network=Non
         user_info['n'] = network
         user_info['q'] = query
 
+    if sender:
+        alert['title'] = sender
+
+    if channel:
+        alert['subtitle'] = channel
+
+    if private:
+        alert['loc-key'] = 'INPUT_MESSAGE_PLACEHOLDER'
+        alert['body'] = 'Message'
+    elif message:
+        alert['body'] = message
+
     payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info)
-    if message:
-        payload_length = len(payload.json())
-        if (payload_length + len(message) - 1) >= MAX_PAYLOAD_LENGTH:
-            message = message[:(MAX_PAYLOAD_LENGTH - payload_length - 3)] + '...'
-        payload.alert = message
 
     apns.gateway_server.send_notification(apns_token, payload)
 

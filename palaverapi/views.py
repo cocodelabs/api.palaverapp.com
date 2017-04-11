@@ -92,13 +92,14 @@ class PushView(RESTView):
         network = attributes.get('network', None)
         badge = int(attributes.get('badge', 1))
         intent = attributes.get('intent', None)
+        private = attributes.get('private', False)
 
         with database:
             token = self.get_token()
             if not token:
                 return Response(status=401)
 
-            queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent)
+            queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent, private=private)
 
         return Response(status=202)
 
