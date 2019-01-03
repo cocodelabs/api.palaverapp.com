@@ -99,7 +99,7 @@ class PushView(RESTView):
             if not token:
                 return Response(status=401)
 
-            queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent, private=private)
+            queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent, private)
 
         return Response(status=202)
 
