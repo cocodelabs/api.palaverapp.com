@@ -73,6 +73,9 @@ class PushView(RESTView):
         if authorization:
             _, access_token = authorization.split(' ', 2)
 
+        if '/' in access_token:
+            access_token, _ = access_token.split('/', 2)
+
         try:
             token = Token.get(token=access_token)
         except Token.DoesNotExist:

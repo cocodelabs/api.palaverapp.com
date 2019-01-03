@@ -60,3 +60,17 @@ class ViewTests(unittest.TestCase):
         self.assertEqual(response.status_code, 202)
         self.assertEqual(len(enqueued), 1)
 
+    def test_push_with_network_uuid_in_token(self):
+        enqueued = []
+
+        def enqueue(*args):
+            enqueued.append(args)
+        queue.enqueue = enqueue
+
+        device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
+        token = Token.create(device=device, token='valid', scope=Token.ALL_SCOPE)
+
+        headers = { 'AUTHORIZATION': 'token valid/network-uuid' }
+        response = self.client.post('/1/push', {}, headers)
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(len(enqueued), 1)
