@@ -1,7 +1,7 @@
 apns==2.0.1
 bugsnag==3.0.0b1
 click==3.3
-gunicorn==18.0
+gunicorn==19.9.0
 invoke==0.9.0
 peewee==2.6.1
 postgres==2.1.2
