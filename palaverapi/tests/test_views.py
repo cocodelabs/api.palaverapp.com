@@ -21,10 +21,12 @@ class ViewTests(unittest.TestCase):
         device = Device.get(apns_token='test_token')
         assert device
 
-        push_token = Token.select().where(Token.device == device, Token.token == 'ec1752bd70320e4763f7165d73e2636cca9e25cf')
-        token = Token.select().where(Token.device == device, Token.token == 'test_token')
-        assert token.get()
-        assert push_token.get()
+        push_token = Token.select().where(Token.device == device, Token.token == 'ec1752bd70320e4763f7165d73e2636cca9e25cf').get()
+        token = Token.select().where(Token.device == device, Token.token == 'test_token').get()
+
+        token.delete_instance()
+        push_token.delete_instance()
+        device.delete_instance()
 
     def test_returns_200_when_re_registering(self):
         response = self.client.post('/1/devices', {'device_token': 'test_token'})
@@ -36,10 +38,12 @@ class ViewTests(unittest.TestCase):
         device = Device.get(apns_token='test_token')
         assert device
 
-        push_token = Token.select().where(Token.device == device, Token.token == 'ec1752bd70320e4763f7165d73e2636cca9e25cf')
-        token = Token.select().where(Token.device == device, Token.token == 'test_token')
-        assert token.get()
-        assert push_token.get()
+        push_token = Token.select().where(Token.device == device, Token.token == 'ec1752bd70320e4763f7165d73e2636cca9e25cf').get()
+        token = Token.select().where(Token.device == device, Token.token == 'test_token').get()
+
+        push_token.delete_instance()
+        token.delete_instance()
+        device.delete_instance()
 
     def test_push_401_missing_token(self):
         response = self.client.post('/1/push', {})
@@ -60,3 +64,5 @@ class ViewTests(unittest.TestCase):
         self.assertEqual(response.status_code, 202)
         self.assertEqual(len(enqueued), 1)
 
+        token.delete_instance()
+        device.delete_instance()
