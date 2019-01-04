@@ -6,44 +6,24 @@ api.palaverapp.com
 
 Available under the [BSD license](LICENSE).
 
-## Setup
+## Development Environment
 
-1. Create a virtual environment:
+You can configure a development environment with the following:
 
-        $ virtualenv venv
+**NOTE**: *These steps assume you have Python 2 along with [pipenv](https://docs.pipenv.org/install/) installed.*
 
-2. Activate the virtual environment:
-
-        $ source venv/bin/activate
-
-3. Install the dependencies:
-
-        $ pip install -r requirements.txt
-
+```
+$ pipenv install
+```
 
 ### Running tests
 
 ```shell
-$ invoke tests
+$ pipenv run test
 ```
 
 ### Running the server
 
-For development:
-
 ```shell
-$ python -m palaverapi
+$ pipenv run python -m palaverapi
 ```
-
-In production:
-
-```shell
-$ gunicorn palaverapi:wsgi
-```
-
-Via foreman:
-
-```shell
-$ foreman start
-```
-
