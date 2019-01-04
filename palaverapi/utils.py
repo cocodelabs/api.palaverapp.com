@@ -1,14 +1,19 @@
 import os
-from apns import APNs, Payload, MAX_PAYLOAD_LENGTH
+from apns2.client import APNsClient
+from apns2.payload import Payload
 from bugsnag import Client
 
+TOPIC = 'com.kylefuller.palaver'
 DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates'))
-client = Client(asynchronous=False, install_sys_hook=False)
+bugsnag_client = Client(asynchronous=False, install_sys_hook=False)
+apns_client = None
 
-@client.capture
+@bugsnag_client.capture()
 def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None, private=False):
-    apns = APNs(cert_file=os.path.join(DIRECTORY, 'public.pem'),
-                key_file=os.path.join(DIRECTORY, 'private.pem'))
+    global apns_client
+
+    if apns_client is None:
+        apns_client = APNsClient(os.path.join(DIRECTORY, 'production.pem'), heartbeat_period=30)
 
     query = None
 
@@ -46,15 +51,5 @@ def send_notification(apns_token, message, sender, channel, badge=1, network=Non
 
     payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info)
 
-    apns.gateway_server.send_notification(apns_token, payload)
-
-    success = True
-
-    for (token_hex, fail_time) in apns.feedback_server.items():
-        if apns_token == token_hex:
-            success = False
-        else:
-            pass
-
-    return success
-
+    apns_client.connect()
+    apns_client.send_notification(apns_token, payload, TOPIC)

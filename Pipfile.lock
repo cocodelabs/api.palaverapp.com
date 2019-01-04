@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e4f1e05cf4ad5255b7109f0930dffea2dc6aa1a37d7dfc4e717dc5662b18b480"
+            "sha256": "fc7cf4216bfb379546e2b24caefae698a102e405d861d25d3aa51f07ddfee2e9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,12 +16,9 @@
         ]
     },
     "default": {
-        "apns": {
-            "hashes": [
-                "sha256:c81c76d36a6a7b9d40c78e1f08bd0f69cabb48a15a9b4483625e769082d3c5c9"
-            ],
-            "index": "pypi",
-            "version": "==2.0.1"
+        "apns2": {
+            "git": "https://github.com/Pr0Ger/PyAPNs2.git",
+            "ref": "6f3b2a7456ef22c6aafc1467618f665130b0aeea"
         },
         "bugsnag": {
             "hashes": [
