@@ -1,7 +1,6 @@
 api.palaverapp.com
 ==================
 
-[![Build Status](https://travis-ci.org/cocodelabs/api.palaverapp.com.png?branch=master)](https://travis-ci.org/cocodelabs/api.palaverapp.com)
 [![Apiary Documentation](https://img.shields.io/badge/Apiary-Documented-blue.svg)](http://docs.palaver.apiary.io/)
 
 Available under the [BSD license](LICENSE).
