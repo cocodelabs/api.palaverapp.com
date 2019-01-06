@@ -39,3 +39,52 @@ HOST: https://api.palaverapp.com/
             + ACTION
 
 + Response 202
+
+## Authorisations [/authorisations]
+
+### List all authorisations [GET]
+
++ Response 200 (application/json)
+    + Attributes (array[Authorisation], fixed-type)
+
+### Create new authorisation [POST]
+
++ Attributes
+    + token
+    + scopes
+
++ Request
+    + Headers
+
+            Authorization: token 255b34ece6bf163b24474359bc74582ddf2c6726
+
++ Response 201 (application/json)
+    + Attributes (Authorisation)
+        + token: d73e2636cca9e25cf636cca9e
+
+## Authorisation [/authorisations/{id}]
+
++ Parameters
+    + id: 636cca9e
+
+### View an authorisation [GET]
+
++ Response 200 (application/json)
+    + Attributes (Authorisation)
+
+### Delete an authorisation [DELETE]
+
++ Response 204
+
+## Data Structures
+
+### Scope (enum)
+
++ all
++ push
+
+### Authorisation
+
++ url: `/authorisations/636cca9e`
++ scopes (array[Scope], fixed-type)
++ `token_last_eight`: 636cca9e
