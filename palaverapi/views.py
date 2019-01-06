@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 import os
 
 import redis
@@ -6,7 +7,7 @@ from rq import Queue
 import peewee
 
 from rivr.router import Router
-from rivr.http import Response, RESTResponse
+from rivr.http import Http404, Response, RESTResponse
 from rivr.views import RESTView
 
 from palaverapi.models import database, Device, Token
@@ -64,7 +65,9 @@ class RegisterView(RESTView):
 router.register(r'^1/devices$', database(RegisterView.as_view()))
 
 
-class PushView(RESTView):
+class PermissionRequiredMixin(object):
+    scope_required = 'all'
+
     def get_token(self):
         authorization = self.request.headers.get('AUTHORIZATION', None)
         if not authorization:
@@ -79,6 +82,25 @@ class PushView(RESTView):
             token = None
 
         return token
+
+    def has_permission(self):
+        self.token = self.get_token()
+        return self.token and (self.token.scope == 'all' or self.token.scope == self.scope_required)
+
+    def handle_no_permission(self):
+        return Response(status=401)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+
+        if not self.has_permission():
+            return self.handle_no_permission()
+
+        return super(PermissionRequiredMixin, self).dispatch(request, *args, **kwargs)
+
+
+class PushView(PermissionRequiredMixin, RESTView):
+    scope_required = 'push'
 
     def post(self, request):
         try:
@@ -103,5 +125,61 @@ class PushView(RESTView):
 
         return Response(status=202)
 
+
 router.register(r'^1/push$', PushView.as_view())
 
+
+def serialise_authorisation(token):
+    return {
+        'url': '/authorisations/{}'.format(token.token_last_eight),
+        'token_last_eight': token.token_last_eight,
+        'scopes': [token.scope],
+    }
+
+
+class AuthorisationListView(PermissionRequiredMixin, RESTView):
+    def get(self, request):
+        tokens = Token.select().where(Token.device == self.token.device)
+        return [serialise_authorisation(token) for token in tokens]
+
+    def post(self, request):
+        try:
+            attributes = request.POST
+        except (UnicodeDecodeError, ValueError):
+            return Response(status=400)
+
+        scopes = attributes.get('scopes', None)
+        scope = Token.ALL_SCOPE
+        if scopes and len(scopes) == 1:
+            if scopes[0] == Token.ALL_SCOPE or scopes[0] == Token.PUSH_SCOPE:
+                scope = scopes[0]
+
+        token = attributes.get('token', None)
+        if token is None or not len(token) > 20:
+            token = str(uuid.uuid4())
+
+        authorisation = Token.create(device=self.token.device, token=token, scope=scope)
+        attributes = serialise_authorisation(self.token)
+        attributes['token'] = token
+        return RESTResponse(request, attributes, status=201)
+
+
+class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
+    def get_authorisation(self, token_last_eight):
+        try:
+            return Token.select().where(Token.device == self.token.device, Token.token.endswith(token_last_eight)).get()
+        except Token.DoesNotExist:
+            raise Http404()
+
+    def get(self, request, token_last_eight):
+        authorisation = self.get_authorisation(token_last_eight)
+        return serialise_authorisation(authorisation)
+
+    def delete(self, request, token_last_eight):
+        authorisation = self.get_authorisation(token_last_eight)
+        authorisation.delete_instance()
+        return Response(status=204)
+
+
+router.register(r'^authorisations$', AuthorisationListView.as_view())
+router.register(r'^authorisations/(?P<token_last_eight>[\w]+)$', AuthorisationDetailView.as_view())

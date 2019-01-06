@@ -23,3 +23,6 @@ class Token(database.Model):
     def __repr__(self):
         return '<Token {} ({})>'.format(self.token, self.scope)
 
+    @property
+    def token_last_eight(self):
+        return self.token[-8:]
