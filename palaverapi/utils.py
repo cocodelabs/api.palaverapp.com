@@ -1,7 +1,9 @@
 import os
 from apns2.client import APNsClient
+from apns2.errors import BadDeviceToken, Unregistered
 from apns2.payload import Payload
 from bugsnag import Client
+from palaverapi.models import database, Device, Token
 
 TOPIC = 'com.kylefuller.palaver'
 DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates'))
@@ -52,4 +54,13 @@ def send_notification(apns_token, message, sender, channel, badge=1, network=Non
     payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info)
 
     apns_client.connect()
-    apns_client.send_notification(apns_token, payload, TOPIC)
+
+    try:
+        apns_client.send_notification(apns_token, payload, TOPIC)
+    except (BadDeviceToken, Unregistered) as e:
+        with database.transaction():
+            try:
+                device = Device.get(Device.apns_token == apns_token)
+                device.delete_instance(recursive=True)
+            except Device.DoesNotExist:
+                return
