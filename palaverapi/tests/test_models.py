@@ -57,3 +57,7 @@ class TokenTests(unittest.TestCase):
                     device=self.device, token=self.token.token,
                     scope=Token.ALL_SCOPE)
 
+    def test_delete_device(self):
+        self.device.delete_instance(recursive=True)
+        self.assertFalse(Token.select().exists())
+        self.assertFalse(Device.select().exists())
