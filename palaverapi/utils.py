@@ -3,19 +3,24 @@ from apns2.client import APNsClient
 from apns2.errors import BadDeviceToken, Unregistered
 from apns2.payload import Payload
 from bugsnag import Client
-from palaverapi.models import database, Device, Token
+from palaverapi.models import database, Device
 
 TOPIC = 'com.kylefuller.palaver'
 DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates'))
 bugsnag_client = Client(asynchronous=False, install_sys_hook=False)
 apns_client = None
 
-@bugsnag_client.capture()
-def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None, private=False):
-    global apns_client
+def load_apns_client():
+    global apns_client 
 
     if apns_client is None:
         apns_client = APNsClient(os.path.join(DIRECTORY, 'production.pem'), heartbeat_period=30)
+
+    return apns_client
+
+@bugsnag_client.capture()
+def send_notification(apns_token, message, sender, channel, badge=1, network=None, intent=None, private=False):
+    apns_client = load_apns_client()
 
     query = None
 
