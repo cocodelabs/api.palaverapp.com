@@ -116,7 +116,7 @@ class PushView(PermissionRequiredMixin, RESTView):
         intent = attributes.get('intent', None)
         private = attributes.get('private', False)
 
-        with database:
+        with database.transaction():
             token = self.get_token()
             if not token:
                 return Response(status=401)
