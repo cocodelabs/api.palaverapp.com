@@ -22,12 +22,12 @@
         },
         "bugsnag": {
             "hashes": [
-                "sha256:73ed8f846d48064dffa785a1de33ad5e6c36ea07522f4f52427a4bb301b77791",
-                "sha256:97bb5cda1bf211372e3872a1c809e52971c660ad7ca92b9b725e2ba8ea3eb344",
-                "sha256:9c700a65c5c350aab1ce6388e7cf59fc8bbaecfb7a422a9773e07b1f8e44d4df"
+                "sha256:2746dfb7feaf1a2ebd8373a3d8c4144af8ece448327161f4b9be217ed47facb3",
+                "sha256:57bfc7c594014f2f795d24f561bcabd622f6127ddfa0417831a8a5150a1fd6e9",
+                "sha256:a9709616688a4babb0789dbe9a0edcdb8abb28c3477a7a34fa66268fe35f1126"
             ],
             "index": "pypi",
-            "version": "==3.5.0"
+            "version": "==3.5.2"
         },
         "click": {
             "hashes": [
