@@ -158,10 +158,17 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
         if token is None or not len(token) > 20:
             token = str(uuid.uuid4())
 
-        authorisation = Token.create(device=self.token.device, token=token, scope=scope)
+        status = 201
+        try:
+            with database.transaction():
+                authorisation = Token.create(device=self.token.device, token=token, scope=scope)
+        except peewee.IntegrityError:
+            status = 200
+            authorisation = Token.get(device=self.token.device, token=token, scope=scope)
+
         attributes = serialise_authorisation(self.token)
         attributes['token'] = token
-        return RESTResponse(request, attributes, status=201)
+        return RESTResponse(request, attributes, status=status)
 
 
 class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
