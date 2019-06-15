@@ -144,6 +144,24 @@ class AuthorisationListViewTests(unittest.TestCase):
         token = Token.select().where(Token.token == content['token']).get()
         token.delete_instance()
 
+    def test_returns_200_when_re_registering(self):
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.post('/authorisations', {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}, headers)
+        response = self.client.post('/authorisations', {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}, headers)
+
+        self.assertEqual(response.status_code, 200)
+
+        content = json.loads(response.content)
+        self.assertTrue('url' in content)
+        self.assertTrue('token' in content)
+        self.assertTrue('token_last_eight' in content)
+        #self.assertEqual(len('token_last_eight'), 8)
+        self.assertTrue('scopes' in content)
+        self.assertEqual(content['token'], '4876f9ca0d91362fae6cd4f9cde5d0044295682e')
+
+        token = Token.select().where(Token.token == content['token']).get()
+        token.delete_instance()
+
 
 class AuthorisationDetailViewTests(unittest.TestCase):
     def setUp(self):
