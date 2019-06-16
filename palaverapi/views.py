@@ -129,6 +129,16 @@ class PushView(PermissionRequiredMixin, RESTView):
 router.register(r'^1/push$', PushView.as_view())
 
 
+class DeviceDetailView(PermissionRequiredMixin, RESTView):
+    http_method_names = ['patch']
+
+    def patch(self, request):
+        device = self.token.device
+        device.apns_token = request.POST['apns_token']
+        device.save()
+        return Response(status=204)
+
+
 def serialise_authorisation(token):
     return {
         'url': '/authorisations/{}'.format(token.token_last_eight),
@@ -188,5 +198,6 @@ class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
         return Response(status=204)
 
 
+router.register(r'^device$', DeviceDetailView.as_view())
 router.register(r'^authorisations$', AuthorisationListView.as_view())
 router.register(r'^authorisations/(?P<token_last_eight>[\w]+)$', AuthorisationDetailView.as_view())

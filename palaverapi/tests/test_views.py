@@ -69,6 +69,27 @@ class ViewTests(unittest.TestCase):
         device.delete_instance()
 
 
+class DeviceDetailViewTests(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(router)
+
+        self.device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
+        self.token = Token.create(device=self.device, token='e4763f7165d73e2636cca9e', scope=Token.ALL_SCOPE)
+
+    def tearDown(self):
+        self.token.delete_instance()
+        self.device.delete_instance()
+
+    def test_update_apns_token(self):
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.http('PATCH', '/device', {'apns_token': 'new_token'}, headers)
+
+        self.assertEqual(response.status_code, 204)
+
+        device = Token.get(token=self.token.token).device
+        self.assertEqual(device.apns_token, 'new_token')
+
+
 class AuthorisationListViewTests(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(router)
