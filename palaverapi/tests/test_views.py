@@ -89,6 +89,24 @@ class DeviceDetailViewTests(unittest.TestCase):
         device = Token.get(token=self.token.token).device
         self.assertEqual(device.apns_token, 'new_token')
 
+    def test_delete_device(self):
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.http('DELETE', '/device', {}, headers)
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(Token.select().count(), 0)
+        self.assertEqual(Device.select().count(), 0)
+
+    def test_delete_device_push_token(self):
+        self.token.scope = Token.PUSH_SCOPE
+        self.token.save()
+
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.http('DELETE', '/device', {}, headers)
+
+        self.assertEqual(response.status_code, 401)
+
 
 class AuthorisationListViewTests(unittest.TestCase):
     def setUp(self):

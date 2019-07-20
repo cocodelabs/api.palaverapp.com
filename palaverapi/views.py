@@ -130,12 +130,18 @@ router.register(r'^1/push$', PushView.as_view())
 
 
 class DeviceDetailView(PermissionRequiredMixin, RESTView):
-    http_method_names = ['patch']
+    http_method_names = ['delete', 'patch']
 
     def patch(self, request):
         device = self.token.device
         device.apns_token = request.POST['apns_token']
         device.save()
+        return Response(status=204)
+
+    def delete(self, request):
+        device = self.token.device
+        device.delete_instance(recursive=True)
+
         return Response(status=204)
 
 
