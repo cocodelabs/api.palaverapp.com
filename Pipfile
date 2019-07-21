@@ -8,7 +8,6 @@ verify_ssl = true
 [packages]
 apns2 = {git = "https://github.com/Pr0Ger/PyAPNs2.git",ref = "6f3b2a7456ef22c6aafc1467618f665130b0aeea"}
 bugsnag = "==3.6.0"
-click = "==3.3"
 gunicorn = "==19.9.0"
 invoke = "==0.9.0"
 peewee = "==2.7.4"
@@ -18,7 +17,7 @@ psycopg2-binary = "==2.7.6.1"
 redis = "==2.10.6"
 rivr = "==0.6.0"
 rivr-peewee = "==0.2.1"
-rq = "==0.6.0"
+rq = "==0.8.2"
 six = "==1.10.0"
 WebOb = "==1.6.1"
 
