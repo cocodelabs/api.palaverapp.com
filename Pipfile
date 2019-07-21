@@ -18,7 +18,7 @@ redis = "==2.10.6"
 rivr = "==0.6.0"
 rivr-peewee = "==0.2.1"
 rq = "==0.8.2"
-six = "==1.10.0"
+six = "==1.12.0"
 WebOb = "==1.6.1"
 
 [requires]
