@@ -50,6 +50,10 @@ class ViewTests(unittest.TestCase):
         response = self.client.post('/1/push', {})
         self.assertEqual(response.status_code, 401)
 
+    def test_push_401_invalid_token(self):
+        response = self.client.post('/1/push', {}, { 'AUTHORIZATION': 'Bearer' })
+        self.assertEqual(response.status_code, 401)
+
     def test_push(self):
         enqueued = []
 

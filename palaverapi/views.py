@@ -70,7 +70,7 @@ class PermissionRequiredMixin(object):
 
     def get_token(self):
         authorization = self.request.headers.get('AUTHORIZATION', None)
-        if not authorization:
+        if not authorization or (authorization and ' ' not in authorization):
             return
 
         if authorization:
