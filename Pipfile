@@ -19,7 +19,7 @@ rivr = "==0.6.0"
 rivr-peewee = "==0.2.1"
 rq = "==0.8.2"
 six = "==1.10.0"
-WebOb = "==1.6.1"
+WebOb = "==1.8.5"
 
 [requires]
 python_version = "2.7"
