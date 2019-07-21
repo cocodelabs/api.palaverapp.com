@@ -5,19 +5,19 @@ from time import sleep
 
 
 @task
-def dropdb():
+def dropdb(context):
     from palaverapi.models import database, Device, Token
     Token.drop_table(True)
     Device.drop_table(True)
 
 @task
-def syncdb():
+def syncdb(context):
     from palaverapi.models import database, Device, Token
     Device.create_table()
     Token.create_table()
 
 @task
-def upload_certs():
+def upload_certs(context):
     with open('certificates/private.pem') as fp:
         priv_key = fp.read()
 
@@ -34,12 +34,12 @@ def configure_db():
     run('invoke syncdb')
 
 @task
-def tests():
+def tests(context):
     configure_db()
     run('python -m unittest discover')
 
 @task
-def test_blueprint():
+def test_blueprint(context):
     configure_db()
 
     from rivr import serve
@@ -49,7 +49,7 @@ def test_blueprint():
     run('dredd ./apiary.apib http://localhost:8080/')
 
 @task
-def cleanup():
+def cleanup(context):
     import sys
     import math
     from palaverapi.utils import load_apns_client, TOPIC
