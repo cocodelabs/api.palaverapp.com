@@ -1,6 +1,7 @@
 import hashlib
 import uuid
 import os
+import json
 
 import redis
 from rq import Queue
@@ -9,17 +10,28 @@ import peewee
 from rivr.router import Router
 from rivr.http import Http404, Response, RESTResponse
 from rivr.views import RESTView
+from rivr.middleware import ErrorWrapper
 
 from palaverapi.models import database, Device, Token
 from palaverapi.utils import send_notification
 
 
 router = Router()
-app = router
+app = ErrorWrapper(
+    router,
+    custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
+    custom_500=lambda request, e: ProblemResponse(500, 'Internal Server Error')
+)
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 redis = redis.from_url(redis_url)
 queue = Queue(connection=redis)
+
+
+class ProblemResponse(Response):
+    def __init__(self, status, title=None):
+        content = json.dumps({ 'title': title })
+        super(ProblemResponse, self).__init__(content=content, status=status, content_type='application/problem+json')
 
 
 @router.register(r'^$')
@@ -88,7 +100,7 @@ class PermissionRequiredMixin(object):
         return self.token and (self.token.scope == 'all' or self.token.scope == self.scope_required)
 
     def handle_no_permission(self):
-        return Response(status=401)
+        return ProblemResponse(401, 'Unauthorized')
 
     def dispatch(self, request, *args, **kwargs):
         self.request = request
@@ -106,7 +118,7 @@ class PushView(PermissionRequiredMixin, RESTView):
         try:
             attributes = request.POST
         except (UnicodeDecodeError, ValueError):
-            return Response(status=400)
+            return ProblemResponse(400, 'Invalid request body')
 
         message = attributes.get('message', None)
         sender = attributes.get('sender', None)
@@ -119,7 +131,7 @@ class PushView(PermissionRequiredMixin, RESTView):
         with database:
             token = self.get_token()
             if not token:
-                return Response(status=401)
+                return ProblemResponse(401, 'Unauthorized')
 
             queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent, private)
 
@@ -162,7 +174,7 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
         try:
             attributes = request.POST
         except (UnicodeDecodeError, ValueError):
-            return Response(status=400)
+            return ProblemResponse(400, 'Invalid request body')
 
         scopes = attributes.get('scopes', None)
         scope = Token.ALL_SCOPE

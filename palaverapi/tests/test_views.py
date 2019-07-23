@@ -49,10 +49,12 @@ class ViewTests(unittest.TestCase):
     def test_push_401_missing_token(self):
         response = self.client.post('/1/push', {})
         self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
     def test_push_401_invalid_token(self):
         response = self.client.post('/1/push', {}, { 'AUTHORIZATION': 'Bearer' })
         self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
     def test_push(self):
         enqueued = []
@@ -110,6 +112,7 @@ class DeviceDetailViewTests(unittest.TestCase):
         response = self.client.http('DELETE', '/device', {}, headers)
 
         self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
 
 class AuthorisationListViewTests(unittest.TestCase):
