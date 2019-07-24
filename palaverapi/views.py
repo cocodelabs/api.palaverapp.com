@@ -182,22 +182,21 @@ class PushView(PermissionRequiredMixin, RESTView):
         intent = attributes.get('intent', None)
         private = attributes.get('private', False)
 
-        with database:
-            token = self.get_token()
-            if not token:
-                return ProblemResponse(401, 'Unauthorized')
+        token = self.get_token()
+        if not token:
+            return ProblemResponse(401, 'Unauthorized')
 
-            queue.enqueue(
-                send_notification,
-                token.device.apns_token,
-                message,
-                sender,
-                channel,
-                badge,
-                network,
-                intent,
-                private,
-            )
+        queue.enqueue(
+            send_notification,
+            token.device.apns_token,
+            message,
+            sender,
+            channel,
+            badge,
+            network,
+            intent,
+            private,
+        )
 
         return Response(status=202)
 
