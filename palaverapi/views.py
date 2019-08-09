@@ -164,7 +164,13 @@ router.register(r'^1/push$', PushView.as_view())
 
 
 class DeviceDetailView(PermissionRequiredMixin, RESTView):
-    http_method_names = ['delete', 'patch']
+    http_method_names = ['options', 'head', 'get', 'delete', 'patch']
+
+    def get(self, request):
+        device = self.token.device
+        return RESTResponse(request, {
+            'apns_token': device.apns_token,
+        })
 
     def patch(self, request):
         device = self.token.device

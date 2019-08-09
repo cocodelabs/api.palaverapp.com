@@ -93,6 +93,14 @@ class DeviceDetailViewTests(unittest.TestCase):
         self.token.delete_instance()
         self.device.delete_instance()
 
+    def test_get_device(self):
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.http('GET', '/device', {}, headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.content, '{"apns_token": "ec1752bd70320e4763f7165d73e2636cca9e25cf"}')
+
     def test_update_apns_token(self):
         headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
         response = self.client.http('PATCH', '/device', {'apns_token': 'new_token'}, headers)
