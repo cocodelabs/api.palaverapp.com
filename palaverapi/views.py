@@ -28,6 +28,15 @@ redis = redis.from_url(redis_url)
 queue = Queue(connection=redis)
 
 
+def is_redis_available():
+    try:
+        redis.ping()
+    except redis.exceptions.ConnectionError:
+        return False
+
+    return True
+
+
 class ProblemResponse(Response):
     def __init__(self, status, title=None):
         content = json.dumps({ 'title': title })
@@ -37,6 +46,19 @@ class ProblemResponse(Response):
 @router.register(r'^$')
 def status(request):
     return Response(status=204)
+
+
+@router.register(r'^health$')
+def status(request):
+    if is_redis_available:
+        return Response(json.dumps({
+            'status': 'pass',
+        }), content_type='application/health+json')
+
+    return Response(json.dumps({
+        'status': 'fail',
+    }), status=504, content_type='application/health+json')
+
 
 @router.register(r'^500$')
 def crash(request):

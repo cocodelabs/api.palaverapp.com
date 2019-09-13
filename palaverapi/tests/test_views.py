@@ -13,6 +13,13 @@ class ViewTests(unittest.TestCase):
     def test_status(self):
         assert self.client.get('/').status_code is 204
 
+    def test_health(self):
+        response = self.client.get('/health')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/health+json')
+        self.assertEqual(response.content, '{"status": "pass"}')
+
     def test_register(self):
         response = self.client.post('/1/devices', {'device_token': 'test_token'})
         self.assertEqual(response.status_code, 201)
