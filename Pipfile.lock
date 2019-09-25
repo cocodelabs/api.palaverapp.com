@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bb10e2ca5a2269429fdba2f87376b596f09beab779148dd867373090bb4fbf55"
+            "sha256": "c7b4ec4b0db76f63dece014f82b90a1b0f73c3dbfb3bb1c10483c229d469062c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -54,10 +54,10 @@
         },
         "peewee": {
             "hashes": [
-                "sha256:1e127ed4c4f635f7c491c64fe7d7039644750bc8b13b64ea6fc7fa29d99fb96d"
+                "sha256:f3f5c80c51b632d031f60454accadd84f166453a471bff63093ca674973f2a4e"
             ],
             "index": "pypi",
-            "version": "==2.7.4"
+            "version": "==3.11.2"
         },
         "postgres": {
             "hashes": [
