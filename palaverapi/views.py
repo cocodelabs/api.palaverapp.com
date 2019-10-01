@@ -2,6 +2,7 @@ import hashlib
 import uuid
 import os
 import json
+import logging
 
 import redis
 from rq import Queue
@@ -16,11 +17,17 @@ from palaverapi.models import database, Device, Token
 from palaverapi.utils import send_notification
 
 
+def handle_error(request, exception):
+    logger = logging.getLogger('rivr.request')
+    logger.error(exception)
+    return ProblemResponse(500, 'Internal Server Error')
+
+
 router = Router()
 app = ErrorWrapper(
     router,
     custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
-    custom_500=lambda request, e: ProblemResponse(500, 'Internal Server Error')
+    custom_500=handle_error
 )
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
