@@ -205,6 +205,17 @@ class AuthorisationListViewTests(unittest.TestCase):
         token = Token.select().where(Token.token == content['token']).get()
         token.delete_instance()
 
+    def test_create_with_token_collision(self):
+        device = Device.create(apns_token='apnstoken')
+        token = Token.create(device=device, token='4876f9ca0d91362fae6cd4f9cde5d0044295682e', scope=Token.ALL_SCOPE)
+
+        headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
+        response = self.client.post('/authorisations', {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}, headers)
+        self.assertEqual(response.status_code, 403)
+
+        token.delete_instance()
+        device.delete_instance()
+
     def test_returns_200_when_re_registering(self):
         headers = { 'AUTHORIZATION': 'token e4763f7165d73e2636cca9e' }
         response = self.client.post('/authorisations', {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}, headers)

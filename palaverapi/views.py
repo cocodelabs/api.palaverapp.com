@@ -224,10 +224,18 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
         status = 201
         try:
             with database.transaction():
-                authorisation = Token.create(device=self.token.device, token=token, scope=scope)
+                Token.create(device=self.token.device, token=token, scope=scope)
         except peewee.IntegrityError:
             status = 200
-            authorisation = Token.get(device=self.token.device, token=token, scope=scope)
+
+            try:
+                t = Token.get(device=self.token.device, token=token)
+            except Token.DoesNotExist:
+                return ProblemResponse(403, 'Access Denied')
+
+            if t.scope != scope:
+                t.scope = scope
+                t.save()
 
         attributes = serialise_authorisation(self.token)
         attributes['token'] = token
