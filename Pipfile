@@ -10,7 +10,7 @@ apns2 = {git = "https://github.com/Pr0Ger/PyAPNs2.git",ref = "6f3b2a7456ef22c6aa
 bugsnag = "==3.6.0"
 gunicorn = "==19.9.0"
 invoke = "==1.2.0"
-peewee = "==2.7.4"
+peewee = "==3.13.0"
 postgres = "==2.2.2"
 psycopg2 = "==2.7.6.1"
 psycopg2-binary = "==2.7.6.1"
