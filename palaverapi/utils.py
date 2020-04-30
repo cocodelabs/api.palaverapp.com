@@ -54,10 +54,12 @@ def send_notification(
         sound = 'default'
 
     user_info = {}
+    thread_id = None
 
     if query and network:
         user_info['n'] = network
         user_info['q'] = query
+        thread_id = 'plv://{0}/{1}'.format(network, query)
 
     if sender:
         alert['title'] = sender
@@ -71,7 +73,7 @@ def send_notification(
     elif message:
         alert['body'] = message
 
-    payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info)
+    payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id)
 
     apns_client.connect()
 
