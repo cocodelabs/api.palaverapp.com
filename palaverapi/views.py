@@ -9,7 +9,7 @@ from rq import Queue
 import peewee
 
 from rivr.router import Router
-from rivr.http import Http404, Response, RESTResponse
+from rivr.response import Http404, Response, RESTResponse
 from rivr.middleware import ErrorWrapper
 
 from palaverapi.rest_view import RESTView
