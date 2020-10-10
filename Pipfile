@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 apns2 = {git = "https://github.com/Pr0Ger/PyAPNs2.git",ref = "6f3b2a7456ef22c6aafc1467618f665130b0aeea"}
 bugsnag = "==3.9.0"
-gunicorn = "==19.9.0"
+gunicorn = "==19.10.0"
 invoke = "==1.2.0"
 peewee = "==2.7.4"
 postgres = "==2.2.2"
