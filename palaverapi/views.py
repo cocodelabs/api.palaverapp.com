@@ -10,9 +10,9 @@ import peewee
 
 from rivr.router import Router
 from rivr.http import Http404, Response, RESTResponse
-from rivr.views import RESTView
 from rivr.middleware import ErrorWrapper
 
+from palaverapi.rest_view import RESTView
 from palaverapi.models import database, Device, Token
 from palaverapi.utils import send_notification
 
