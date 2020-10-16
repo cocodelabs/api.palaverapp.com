@@ -1,5 +1,5 @@
 from rivr.views import View
-from rivr.http import Response, ResponseNoContent, RESTResponse, ResponseNotModified
+from rivr.response import Response, ResponseNoContent, RESTResponse, ResponseNotModified
 
 
 class RESTView(View):

@@ -9,7 +9,7 @@ from rq import Queue
 import peewee
 
 from rivr.router import Router
-from rivr.http import Http404, Response, RESTResponse
+from rivr.response import Http404, Response, RESTResponse
 from rivr.middleware import ErrorWrapper
 
 from palaverapi.rest_view import RESTView
@@ -74,7 +74,7 @@ def crash(request):
 
 class RegisterView(RESTView):
     def post(self, request):
-        apns_token = request.POST['device_token']
+        apns_token = request.attributes['device_token']
         push_token = hashlib.sha1(hashlib.sha1(apns_token + apns_token).hexdigest()).hexdigest()
         status = 200
 
@@ -145,7 +145,7 @@ class PushView(PermissionRequiredMixin, RESTView):
 
     def post(self, request):
         try:
-            attributes = request.POST
+            attributes = request.attributes
         except (UnicodeDecodeError, ValueError):
             return ProblemResponse(400, 'Invalid request body')
 
@@ -181,7 +181,7 @@ class DeviceDetailView(PermissionRequiredMixin, RESTView):
 
     def patch(self, request):
         device = self.token.device
-        device.apns_token = request.POST['apns_token']
+        device.apns_token = request.attributes['apns_token']
         device.save()
         return Response(status=204)
 
@@ -207,7 +207,7 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
 
     def post(self, request):
         try:
-            attributes = request.POST
+            attributes = request.attributes
         except (UnicodeDecodeError, ValueError):
             return ProblemResponse(400, 'Invalid request body')
 

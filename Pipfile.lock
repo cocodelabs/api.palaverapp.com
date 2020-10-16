@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f144b05b81de38f551bbfbd128acd60ec0cdfcfdb6a732a9589ddf76165467db"
+            "sha256": "7b009c7b0ef40796e003730d259adf63164dacb2b06faf0feb9c63a867da1f1b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -105,6 +105,15 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==3.1.1"
         },
+        "enum34": {
+            "hashes": [
+                "sha256:a98a201d6de3f2ab3db284e70a33b0f896fbf35f8086594e8c9e74b909058d53",
+                "sha256:c3858660960c984d6ab0ebad691265180da2b43f07e061c0f8dca9ef3cffd328",
+                "sha256:cce6a7477ed816bd2542d03d53db9f0db935dd013b70f336a95c73979289f248"
+            ],
+            "markers": "python_version in '2.7, 3.3' and python_version < '3'",
+            "version": "==1.1.10"
+        },
         "gunicorn": {
             "hashes": [
                 "sha256:c3930fe8de6778ab5ea716cab432ae6335fa9f03b3f2c3e02529214c476f4bcb",
@@ -149,6 +158,14 @@
             ],
             "index": "pypi",
             "version": "==1.4.1"
+        },
+        "ipaddress": {
+            "hashes": [
+                "sha256:6e0f4a39e66cb5bb9a137b00276a2eff74f93b71dcbdad6f10ff7df9d3557fcc",
+                "sha256:b7f8e0369580bb4a24d5ba1d7cc29660a4a6987763faf1d8a8046830e020e7e2"
+            ],
+            "markers": "python_version < '3'",
+            "version": "==1.0.23"
         },
         "peewee": {
             "hashes": [
@@ -248,11 +265,11 @@
         },
         "rivr": {
             "hashes": [
-                "sha256:c541de1435c557aa0c62084b6fd9e1adf2057560bd1fb7107d6644cd8c3f91ed",
-                "sha256:db89fac8af173bfdd2ce755b042b06d92bd724194dc99c28924a387eaa007107"
+                "sha256:190a94897ba2e770e0d2dfc0324aa765233d83180d6db759c0b32eecb80f5f1c",
+                "sha256:c08a27771dc197858223accfdfd22405d6eb7396ad0383554b8e4aaa22c2a51a"
             ],
             "index": "pypi",
-            "version": "==0.6.0"
+            "version": "==0.7.0"
         },
         "rivr-peewee": {
             "hashes": [
