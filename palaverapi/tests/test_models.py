@@ -18,8 +18,9 @@ class DeviceTests(unittest.TestCase):
 
     def testEnsureDeviceUniqueByAPNSToken(self):
         with database.transaction():
-            self.assertRaises(IntegrityError, Device.create,
-                    apns_token=self.device.apns_token)
+            self.assertRaises(
+                IntegrityError, Device.create, apns_token=self.device.apns_token
+            )
 
 
 class TokenTests(unittest.TestCase):
@@ -29,7 +30,9 @@ class TokenTests(unittest.TestCase):
         self.device = Device.create(apns_token=apns_token)
 
         token = 'test_token'
-        self.token = Token.create(device=self.device, token=token, scope=Token.PUSH_SCOPE)
+        self.token = Token.create(
+            device=self.device, token=token, scope=Token.PUSH_SCOPE
+        )
 
     def tearDown(self):
         super(TokenTests, self).tearDown()
@@ -53,7 +56,10 @@ class TokenTests(unittest.TestCase):
 
     def testEnsureTokenUniqueByAPNSToken(self):
         with database.transaction():
-            self.assertRaises(IntegrityError, Token.create,
-                    device=self.device, token=self.token.token,
-                    scope=Token.ALL_SCOPE)
-
+            self.assertRaises(
+                IntegrityError,
+                Token.create,
+                device=self.device,
+                token=self.token.token,
+                scope=Token.ALL_SCOPE,
+            )

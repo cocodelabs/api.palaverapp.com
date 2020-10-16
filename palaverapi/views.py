@@ -27,7 +27,7 @@ router = Router()
 app = ErrorWrapper(
     router,
     custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
-    custom_500=handle_error
+    custom_500=handle_error,
 )
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
@@ -46,8 +46,10 @@ def is_redis_available():
 
 class ProblemResponse(Response):
     def __init__(self, status, title=None):
-        content = json.dumps({ 'title': title })
-        super(ProblemResponse, self).__init__(content=content, status=status, content_type='application/problem+json')
+        content = json.dumps({'title': title})
+        super(ProblemResponse, self).__init__(
+            content=content, status=status, content_type='application/problem+json'
+        )
 
 
 @router.register(r'^$')
@@ -58,13 +60,24 @@ def status(request):
 @router.register(r'^health$')
 def status(request):
     if is_redis_available:
-        return Response(json.dumps({
-            'status': 'pass',
-        }), content_type='application/health+json')
+        return Response(
+            json.dumps(
+                {
+                    'status': 'pass',
+                }
+            ),
+            content_type='application/health+json',
+        )
 
-    return Response(json.dumps({
-        'status': 'fail',
-    }), status=504, content_type='application/health+json')
+    return Response(
+        json.dumps(
+            {
+                'status': 'fail',
+            }
+        ),
+        status=504,
+        content_type='application/health+json',
+    )
 
 
 @router.register(r'^500$')
@@ -75,7 +88,9 @@ def crash(request):
 class RegisterView(RESTView):
     def post(self, request):
         apns_token = request.attributes['device_token']
-        push_token = hashlib.sha1(hashlib.sha1(apns_token + apns_token).hexdigest()).hexdigest()
+        push_token = hashlib.sha1(
+            hashlib.sha1(apns_token + apns_token).hexdigest()
+        ).hexdigest()
         status = 200
 
         try:
@@ -87,20 +102,28 @@ class RegisterView(RESTView):
 
         try:
             with database.transaction():
-                token = Token.create(device=device, token=apns_token, scope=Token.ALL_SCOPE)
+                token = Token.create(
+                    device=device, token=apns_token, scope=Token.ALL_SCOPE
+                )
         except peewee.IntegrityError:
             token = Token.get(device=device, token=apns_token)
 
         try:
             with database.transaction():
-                push = Token.create(device=device, token=push_token, scope=Token.PUSH_SCOPE)
+                push = Token.create(
+                    device=device, token=push_token, scope=Token.PUSH_SCOPE
+                )
         except peewee.IntegrityError:
             push = Token.get(device=device, token=push_token)
 
-        return RESTResponse(request, {
-            'device_token': apns_token,
-            'push_token': push_token,
-        }, status=status)
+        return RESTResponse(
+            request,
+            {
+                'device_token': apns_token,
+                'push_token': push_token,
+            },
+            status=status,
+        )
 
 
 router.register(r'^1/devices$', database(RegisterView.as_view()))
@@ -126,7 +149,9 @@ class PermissionRequiredMixin(object):
 
     def has_permission(self):
         self.token = self.get_token()
-        return self.token and (self.token.scope == 'all' or self.token.scope == self.scope_required)
+        return self.token and (
+            self.token.scope == 'all' or self.token.scope == self.scope_required
+        )
 
     def handle_no_permission(self):
         return ProblemResponse(401, 'Unauthorized')
@@ -162,7 +187,17 @@ class PushView(PermissionRequiredMixin, RESTView):
             if not token:
                 return ProblemResponse(401, 'Unauthorized')
 
-            queue.enqueue(send_notification, token.device.apns_token, message, sender, channel, badge, network, intent, private)
+            queue.enqueue(
+                send_notification,
+                token.device.apns_token,
+                message,
+                sender,
+                channel,
+                badge,
+                network,
+                intent,
+                private,
+            )
 
         return Response(status=202)
 
@@ -175,9 +210,12 @@ class DeviceDetailView(PermissionRequiredMixin, RESTView):
 
     def get(self, request):
         device = self.token.device
-        return RESTResponse(request, {
-            'apns_token': device.apns_token,
-        })
+        return RESTResponse(
+            request,
+            {
+                'apns_token': device.apns_token,
+            },
+        )
 
     def patch(self, request):
         device = self.token.device
@@ -245,7 +283,14 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
 class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
     def get_authorisation(self, token_last_eight):
         try:
-            return Token.select().where(Token.device == self.token.device, Token.token.endswith(token_last_eight)).get()
+            return (
+                Token.select()
+                .where(
+                    Token.device == self.token.device,
+                    Token.token.endswith(token_last_eight),
+                )
+                .get()
+            )
         except Token.DoesNotExist:
             raise Http404()
 
@@ -261,4 +306,6 @@ class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
 
 router.register(r'^device$', DeviceDetailView.as_view())
 router.register(r'^authorisations$', AuthorisationListView.as_view())
-router.register(r'^authorisations/(?P<token_last_eight>[\w]+)$', AuthorisationDetailView.as_view())
+router.register(
+    r'^authorisations/(?P<token_last_eight>[\w]+)$', AuthorisationDetailView.as_view()
+)

@@ -28,7 +28,7 @@ class RESTViewTestCase(unittest.TestCase):
     def test_json(self):
         class JSONView(RESTView):
             def get(self, request):
-                return {'test':True}
+                return {'test': True}
 
         response = JSONView().dispatch(Request())
         self.assertIsInstance(response, RESTResponse)

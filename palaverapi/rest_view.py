@@ -43,6 +43,8 @@ class RESTView(View):
             response = RESTResponse(request, response)
 
         if last_modified:
-            response.headers['Last-Modified'] = formatdate(timegm(last_modified.utctimetuple()))
+            response.headers['Last-Modified'] = formatdate(
+                timegm(last_modified.utctimetuple())
+            )
 
         return response

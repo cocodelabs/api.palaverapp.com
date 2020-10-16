@@ -9,6 +9,7 @@ logger = logging.getLogger('rivr.request')
 
 if os.environ.get('BUGSNAG_API_KEY'):
     from bugsnag import Client
+
     client = Client()
     handler = client.log_handler()
     handler.setLevel(logging.ERROR)
