@@ -1,6 +1,7 @@
 import unittest
 
-from rivr.http import Request, Response, RESTResponse
+from rivr.request import Request
+from rivr.response import Response, RESTResponse
 from palaverapi.rest_view import RESTView
 
 
@@ -27,7 +28,7 @@ class RESTViewTestCase(unittest.TestCase):
     def test_json(self):
         class JSONView(RESTView):
             def get(self, request):
-                return {'test':True}
+                return {'test': True}
 
         response = JSONView().dispatch(Request())
         self.assertIsInstance(response, RESTResponse)
