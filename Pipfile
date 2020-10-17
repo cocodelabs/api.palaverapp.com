@@ -12,10 +12,10 @@ gunicorn = "==19.10.0"
 invoke = "==1.4.1"
 peewee = "==3.13.3"
 psycopg2 = "==2.8.6"
-redis = "==3.0.1"
+redis = "==3.2.1"
 rivr = "==0.7.0"
 rivr-peewee = "==0.2.1"
-rq = "==1.0.0"
+rq = "==1.1.0"
 
 [requires]
 python_version = "2.7"
