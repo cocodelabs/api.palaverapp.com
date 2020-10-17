@@ -88,8 +88,9 @@ def crash(request):
 class RegisterView(RESTView):
     def post(self, request):
         apns_token = request.attributes['device_token']
+        bytes_token = apns_token.encode('utf-8')
         push_token = hashlib.sha1(
-            hashlib.sha1(apns_token + apns_token).hexdigest()
+            hashlib.sha1(bytes_token + bytes_token).hexdigest().encode('utf-8')
         ).hexdigest()
         status = 200
 

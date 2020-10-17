@@ -11,7 +11,7 @@ class ViewTests(unittest.TestCase):
         self.client = TestClient(router)
 
     def test_status(self):
-        assert self.client.get('/').status_code is 204
+        assert self.client.get('/').status_code == 204
 
     def test_health(self):
         response = self.client.get('/health')

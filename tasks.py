@@ -1,5 +1,5 @@
 import os
-import thread
+from threading import Thread
 from invoke import run, task
 from time import sleep
 
@@ -54,7 +54,8 @@ def test_blueprint(context):
     from rivr import serve
     from palaverapi.views import router
 
-    thread.start_new_thread(serve, (router,))
+    thread = Thread(target=serve, args=(router,))
+    thread.start()
 
     run('dredd ./apiary.apib http://localhost:8080/')
 
