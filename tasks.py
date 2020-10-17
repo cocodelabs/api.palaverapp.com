@@ -7,14 +7,18 @@ from time import sleep
 @task
 def dropdb(context):
     from palaverapi.models import database, Device, Token
+
     Token.drop_table(True)
     Device.drop_table(True)
+
 
 @task
 def syncdb(context):
     from palaverapi.models import database, Device, Token
+
     Device.create_table()
     Token.create_table()
+
 
 @task
 def upload_certs(context):
@@ -27,16 +31,21 @@ def upload_certs(context):
     run('heroku config:add "APNS_PRIVATE_KEY={}" --app palaverapi'.format(priv_key))
     run('heroku config:add "APNS_PUBLIC_KEY={}" --app palaverapi'.format(pub_key))
 
+
 def configure_db():
-    database_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tests.sqlite')
+    database_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'tests.sqlite'
+    )
     os.environ['DATABASE_URL'] = 'sqlite:///{}'.format(database_path)
     run('invoke dropdb')
     run('invoke syncdb')
+
 
 @task
 def tests(context):
     configure_db()
     run('python -m unittest discover')
+
 
 @task
 def test_blueprint(context):
@@ -44,9 +53,11 @@ def test_blueprint(context):
 
     from rivr import serve
     from palaverapi.views import router
+
     thread.start_new_thread(serve, (router,))
 
     run('dredd ./apiary.apib http://localhost:8080/')
+
 
 @task
 def cleanup(context):
@@ -59,7 +70,7 @@ def cleanup(context):
 
     apns_client = load_apns_client()
 
-    payload = Payload() # No alert is shown to recipient if payload is empty.
+    payload = Payload()  # No alert is shown to recipient if payload is empty.
 
     stepsize = 500
     total = Device.select().count()
@@ -84,6 +95,5 @@ def cleanup(context):
                 removed_devices += 1
 
         sleep(10)
-
 
     print('\nDone! Removed {} devices.'.format(removed_devices))
