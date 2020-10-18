@@ -16,7 +16,7 @@ psycopg2 = "==2.8.6"
 redis = "==3.3.11"
 rivr = "==0.8.1"
 rivr-peewee = "==0.2.1"
-rq = "==1.1.0"
+rq = "==1.2.2"
 
 [requires]
 python_version = "3.9"
