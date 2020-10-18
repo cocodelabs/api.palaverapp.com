@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "571c41a7a913a8c2f432f3750e73c96b3fb9763cd074941464f5ff0833afc1be"
+            "sha256": "12d8c0ecd8a153ec0e71ecebd4b61086d7fdafce34596eab22a22094e7a7948b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -204,12 +204,12 @@
             "version": "==3.2.1"
         },
         "rivr": {
+            "git": "https://github.com/rivrproject/rivr.git",
             "hashes": [
-                "sha256:190a94897ba2e770e0d2dfc0324aa765233d83180d6db759c0b32eecb80f5f1c",
-                "sha256:c08a27771dc197858223accfdfd22405d6eb7396ad0383554b8e4aaa22c2a51a"
+                "sha256:c08a27771dc197858223accfdfd22405d6eb7396ad0383554b8e4aaa22c2a51a",
+                "sha256:190a94897ba2e770e0d2dfc0324aa765233d83180d6db759c0b32eecb80f5f1c"
             ],
-            "index": "pypi",
-            "version": "==0.7.0"
+            "ref": "cc5ce492001661cd8d5b9f36da3d808a2431152b"
         },
         "rivr-peewee": {
             "hashes": [
