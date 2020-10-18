@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2ce259e34e8e056d0560d94a6e169e7ec4d6badfcb0123280007c616be825424"
+            "sha256": "e0436b139d561da26483dc576d9ce87615a9db7222ef0c554e2824611df3f98b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,11 +18,11 @@
     "default": {
         "apns2": {
             "hashes": [
-                "sha256:a4d5b367fb2faff47d3a71699a348045dd0c21b3a663054cbb48fa2af3c309c5",
-                "sha256:d30dcf227f11948e24a4fd30af82887dcf743aab60b8a4b0624ead5ed3476f03"
+                "sha256:360bcd1f1d6308348adcb317c0192d1631fe01a2b9b73ce95f57c708de2bb88a",
+                "sha256:8c24207aa96dff4687f8d7c9149fc42086f3506b0a76da1f5bf48d74e5569567"
             ],
             "index": "pypi",
-            "version": "==0.5.0"
+            "version": "==0.7.1"
         },
         "bugsnag": {
             "hashes": [
