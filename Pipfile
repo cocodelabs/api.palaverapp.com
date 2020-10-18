@@ -13,7 +13,7 @@ invoke = "==1.4.1"
 peewee = "==3.13.3"
 psycopg2 = "==2.8.6"
 redis = "==3.2.1"
-rivr = {git = "https://github.com/rivrproject/rivr.git",ref = "stable/0.7"}
+rivr = "==0.7.1"
 rivr-peewee = "==0.2.1"
 rq = "==1.1.0"
 
