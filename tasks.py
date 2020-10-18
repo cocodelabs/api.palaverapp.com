@@ -44,7 +44,7 @@ def configure_db():
 @task
 def tests(context):
     configure_db()
-    run('python -m unittest discover')
+    run('pytest')
 
 
 @task
