@@ -53,7 +53,7 @@ class ProblemResponse(Response):
 
 
 @router.register(r'^$')
-def status(request):
+def index(request):
     return Response(status=204)
 
 
