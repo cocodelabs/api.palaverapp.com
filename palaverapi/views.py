@@ -1,6 +1,7 @@
 import hashlib
 import uuid
 import os
+import sys
 import json
 import logging
 
@@ -19,7 +20,7 @@ from palaverapi.utils import send_notification
 
 def handle_error(request, exception):
     logger = logging.getLogger('rivr.request')
-    logger.error(exception)
+    logger.error(exception, exc_info=sys.exc_info())
     return ProblemResponse(500, 'Internal Server Error')
 
 
