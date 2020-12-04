@@ -8,7 +8,7 @@ pytest = "*"
 
 [packages]
 apns2 = "==0.7.1"
-bugsnag = "==4.0.1"
+bugsnag = "==4.0.2"
 gunicorn = "==20.0.4"
 invoke = "==1.4.1"
 peewee = "==3.13.3"
