@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "88ac4368e70e0df2ca43dc74703674f6ea543ab0d0966360b9b6307a5e19aa0d"
+            "sha256": "0230aa7d23f36d2dfcf0749d51cc369f47d5938af354746eb83ba3a5952ab880"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -201,11 +201,11 @@
         },
         "rivr": {
             "hashes": [
-                "sha256:5476eac5d31d42a6c45aae64498a5cd79c26602f03610c422f05ce1b90deb628",
-                "sha256:986dc502ce38b945bac7bf679d26d70824e8202c292217e46d76d6c041f4ff8f"
+                "sha256:de8c2f5abb14b670401147ff98fd1dca73f2a4e6297cbbc3228d6217a8cf076a",
+                "sha256:e87386e0f15c535f63f3af3d3c2dd6030c261ef73921b3fa967d2e62cae442ee"
             ],
             "index": "pypi",
-            "version": "==0.8.1"
+            "version": "==0.9.0"
         },
         "rivr-peewee": {
             "hashes": [
