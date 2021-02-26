@@ -1,8 +1,7 @@
 import json
 from typing import Optional
 
-from rivr.request import Request
-from rivr.response import Response
+from rivr.http import Request, Response
 
 
 class ProblemResponse(Response):

@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Callable
 
-from rivr.response import Response
+from rivr.http import Response
 
 from palaverapi.responses import ProblemResponse
 
