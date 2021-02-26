@@ -1,5 +1,7 @@
 from rivr.views import View
-from rivr.response import Response, ResponseNoContent, RESTResponse, ResponseNotModified
+from rivr.response import Response, ResponseNoContent, ResponseNotModified
+
+from palaverapi.responses import RESTResponse
 
 
 class RESTView(View):

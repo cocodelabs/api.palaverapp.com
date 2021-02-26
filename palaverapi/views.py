@@ -10,12 +10,12 @@ from rq import Queue
 import peewee
 
 from rivr.router import Router
-from rivr.response import Http404, Response, RESTResponse
+from rivr.response import Http404, Response
 from rivr.middleware import ErrorWrapper
 
 from palaverapi.rest_view import RESTView
 from palaverapi.models import database, Device, Token
-from palaverapi.responses import ProblemResponse
+from palaverapi.responses import ProblemResponse, RESTResponse
 from palaverapi.utils import send_notification
 from palaverapi.decorators import requires_body
 

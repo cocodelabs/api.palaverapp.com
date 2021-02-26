@@ -1,5 +1,7 @@
 import json
+from typing import Optional
 
+from rivr.request import Request
 from rivr.response import Response
 
 
@@ -9,3 +11,11 @@ class ProblemResponse(Response):
         super(ProblemResponse, self).__init__(
             content=content, status=status, content_type='application/problem+json'
         )
+
+
+class RESTResponse(Response):
+    def __init__(self, request: Request, payload, status: Optional[int] = None):
+        content = json.dumps(payload)
+        content_type = 'application/json'
+
+        super(RESTResponse, self).__init__(content, status, content_type)
