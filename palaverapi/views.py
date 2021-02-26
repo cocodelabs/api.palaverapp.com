@@ -15,7 +15,9 @@ from rivr.middleware import ErrorWrapper
 
 from palaverapi.rest_view import RESTView
 from palaverapi.models import database, Device, Token
+from palaverapi.responses import ProblemResponse
 from palaverapi.utils import send_notification
+from palaverapi.decorators import requires_body
 
 
 def handle_error(request, exception):
@@ -43,14 +45,6 @@ def is_redis_available():
         return False
 
     return True
-
-
-class ProblemResponse(Response):
-    def __init__(self, status, title=None):
-        content = json.dumps({'title': title})
-        super(ProblemResponse, self).__init__(
-            content=content, status=status, content_type='application/problem+json'
-        )
 
 
 @router.register(r'^$')
@@ -87,8 +81,9 @@ def crash(request):
 
 
 class RegisterView(RESTView):
-    def post(self, request):
-        apns_token = request.attributes['device_token']
+    @requires_body
+    def post(self, request, attributes):
+        apns_token = attributes['device_token']
         bytes_token = apns_token.encode('utf-8')
         push_token = hashlib.sha1(
             hashlib.sha1(bytes_token + bytes_token).hexdigest().encode('utf-8')
@@ -170,12 +165,8 @@ class PermissionRequiredMixin(object):
 class PushView(PermissionRequiredMixin, RESTView):
     scope_required = 'push'
 
-    def post(self, request):
-        try:
-            attributes = request.attributes
-        except (UnicodeDecodeError, ValueError):
-            return ProblemResponse(400, 'Invalid request body')
-
+    @requires_body
+    def post(self, request, attributes):
         message = attributes.get('message', None)
         sender = attributes.get('sender', None)
         channel = attributes.get('channel', None)
