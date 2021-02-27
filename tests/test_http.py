@@ -1,14 +1,14 @@
 import unittest
 import json
 
-from rivr.tests import TestClient
+from rivr.test import Client
 
 from palaverapi.views import app
 
 
 class HTTPTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(app)
+        self.client = Client(app)
 
     def test_404(self):
         response = self.client.get('/404')

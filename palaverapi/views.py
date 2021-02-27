@@ -209,9 +209,10 @@ class DeviceDetailView(PermissionRequiredMixin, RESTView):
             },
         )
 
-    def patch(self, request):
+    @requires_body
+    def patch(self, request, attributes):
         device = self.token.device
-        device.apns_token = request.attributes['apns_token']
+        device.apns_token = attributes['apns_token']
         device.save()
         return Response(status=204)
 
@@ -235,12 +236,8 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
         tokens = Token.select().where(Token.device == self.token.device)
         return [serialise_authorisation(token) for token in tokens]
 
-    def post(self, request):
-        try:
-            attributes = request.attributes
-        except (UnicodeDecodeError, ValueError):
-            return ProblemResponse(400, 'Invalid request body')
-
+    @requires_body
+    def post(self, request, attributes):
         scopes = attributes.get('scopes', None)
         scope = Token.ALL_SCOPE
         if scopes and len(scopes) == 1:

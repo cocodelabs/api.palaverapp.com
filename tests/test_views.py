@@ -1,6 +1,6 @@
 import unittest
 import json
-from rivr.tests import TestClient
+from rivr.test import Client
 
 from palaverapi.views import router, queue
 from palaverapi.models import Device, Token
@@ -8,7 +8,7 @@ from palaverapi.models import Device, Token
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(router)
+        self.client = Client(router)
 
     def test_status(self):
         assert self.client.get('/').status_code == 204
@@ -21,7 +21,11 @@ class ViewTests(unittest.TestCase):
         self.assertEqual(response.content, '{"status": "pass"}')
 
     def test_register(self):
-        response = self.client.post('/1/devices', {'device_token': 'test_token'})
+        response = self.client.post(
+            '/1/devices',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps({'device_token': 'test_token'}).encode('utf-8'),
+        )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(
@@ -51,8 +55,16 @@ class ViewTests(unittest.TestCase):
         device.delete_instance()
 
     def test_returns_200_when_re_registering(self):
-        response = self.client.post('/1/devices', {'device_token': 'test_token'})
-        response = self.client.post('/1/devices', {'device_token': 'test_token'})
+        response = self.client.post(
+            '/1/devices',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps({'device_token': 'test_token'}).encode('utf-8'),
+        )
+        response = self.client.post(
+            '/1/devices',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps({'device_token': 'test_token'}).encode('utf-8'),
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(
@@ -82,12 +94,12 @@ class ViewTests(unittest.TestCase):
         device.delete_instance()
 
     def test_push_401_missing_token(self):
-        response = self.client.post('/1/push', {})
+        response = self.client.post('/1/push')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
     def test_push_401_invalid_token(self):
-        response = self.client.post('/1/push', {}, {'AUTHORIZATION': 'Bearer'})
+        response = self.client.post('/1/push', headers={'AUTHORIZATION': 'Bearer'})
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
 
@@ -102,8 +114,8 @@ class ViewTests(unittest.TestCase):
         device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
         token = Token.create(device=device, token='valid', scope=Token.ALL_SCOPE)
 
-        headers = {'AUTHORIZATION': 'token valid'}
-        response = self.client.post('/1/push', {}, headers)
+        headers = {'AUTHORIZATION': 'token valid', 'Content-Type': 'application/json'}
+        response = self.client.post('/1/push', headers=headers, body=b'{}')
         self.assertEqual(response.status_code, 202)
         self.assertEqual(len(enqueued), 1)
 
@@ -113,7 +125,7 @@ class ViewTests(unittest.TestCase):
 
 class DeviceDetailViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(router)
+        self.client = Client(router)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'
@@ -138,9 +150,15 @@ class DeviceDetailViewTests(unittest.TestCase):
         )
 
     def test_update_apns_token(self):
-        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
+        headers = {
+            'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
+            'Content-Type': 'application/json',
+        }
         response = self.client.http(
-            'PATCH', '/device', {'apns_token': 'new_token'}, headers
+            'PATCH',
+            '/device',
+            headers=headers,
+            body=json.dumps({'apns_token': 'new_token'}).encode('utf-8'),
         )
 
         self.assertEqual(response.status_code, 204)
@@ -150,7 +168,7 @@ class DeviceDetailViewTests(unittest.TestCase):
 
     def test_delete_device(self):
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
-        response = self.client.http('DELETE', '/device', {}, headers)
+        response = self.client.http('DELETE', '/device', headers=headers)
 
         self.assertEqual(response.status_code, 204)
 
@@ -162,7 +180,7 @@ class DeviceDetailViewTests(unittest.TestCase):
         self.token.save()
 
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
-        response = self.client.http('DELETE', '/device', {}, headers)
+        response = self.client.http('DELETE', '/device', headers=headers)
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
@@ -170,7 +188,7 @@ class DeviceDetailViewTests(unittest.TestCase):
 
 class AuthorisationListViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(router)
+        self.client = Client(router)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'
@@ -201,7 +219,7 @@ class AuthorisationListViewTests(unittest.TestCase):
 
     def test_create(self):
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
-        response = self.client.post('/authorisations', {}, headers)
+        response = self.client.post('/authorisations', headers=headers)
 
         self.assertEqual(response.status_code, 201)
 
@@ -217,8 +235,15 @@ class AuthorisationListViewTests(unittest.TestCase):
         token.delete_instance()
 
     def test_create_with_scope(self):
-        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
-        response = self.client.post('/authorisations', {'scopes': ['push']}, headers)
+        headers = {
+            'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
+            'Content-Type': 'application/json',
+        }
+        response = self.client.post(
+            '/authorisations',
+            headers=headers,
+            body=json.dumps({'scopes': ['push']}).encode('utf-8'),
+        )
 
         self.assertEqual(response.status_code, 201)
 
@@ -234,11 +259,16 @@ class AuthorisationListViewTests(unittest.TestCase):
         token.delete_instance()
 
     def test_create_with_token(self):
-        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
+        headers = {
+            'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
+            'Content-Type': 'application/json',
+        }
         response = self.client.post(
             '/authorisations',
-            {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'},
-            headers,
+            headers=headers,
+            body=json.dumps(
+                {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}
+            ).encode('utf-8'),
         )
 
         self.assertEqual(response.status_code, 201)
@@ -262,11 +292,16 @@ class AuthorisationListViewTests(unittest.TestCase):
             scope=Token.ALL_SCOPE,
         )
 
-        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
+        headers = {
+            'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
+            'Content-Type': 'application/json',
+        }
         response = self.client.post(
             '/authorisations',
-            {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'},
-            headers,
+            headers=headers,
+            body=json.dumps(
+                {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}
+            ).encode('utf-8'),
         )
         self.assertEqual(response.status_code, 403)
 
@@ -274,16 +309,24 @@ class AuthorisationListViewTests(unittest.TestCase):
         device.delete_instance()
 
     def test_returns_200_when_re_registering(self):
-        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
+        headers = {
+            'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
+            'Content-Type': 'application/json',
+        }
         response = self.client.post(
             '/authorisations',
-            {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'},
-            headers,
+            headers=headers,
+            body=json.dumps(
+                {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}
+            ).encode('utf-8'),
         )
+        self.assertEqual(response.status_code, 201)
         response = self.client.post(
             '/authorisations',
-            {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'},
-            headers,
+            headers=headers,
+            body=json.dumps(
+                {'token': '4876f9ca0d91362fae6cd4f9cde5d0044295682e'}
+            ).encode('utf-8'),
         )
 
         self.assertEqual(response.status_code, 200)
@@ -302,7 +345,7 @@ class AuthorisationListViewTests(unittest.TestCase):
 
 class AuthorisationDetailViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(router)
+        self.client = Client(router)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'
