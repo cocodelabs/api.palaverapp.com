@@ -26,8 +26,7 @@ def load_apns_client():
     return apns_client
 
 
-@bugsnag_client.capture()
-def send_notification(
+def create_payload(
     apns_token,
     message,
     sender,
@@ -37,8 +36,6 @@ def send_notification(
     intent=None,
     private=False,
 ):
-    apns_client = load_apns_client()
-
     query = None
 
     if channel:
@@ -75,18 +72,27 @@ def send_notification(
     elif message:
         alert['body'] = message
 
-    payload = Payload(
+    return Payload(
         alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id
     )
 
+
+def send_payload(apns_token, payload):
+    apns_client = load_apns_client()
     apns_client.connect()
 
     try:
         apns_client.send_notification(apns_token, payload, TOPIC)
-    except (BadDeviceToken, Unregistered) as e:
+    except (BadDeviceToken, Unregistered):
         with database.transaction():
             try:
                 device = Device.get(Device.apns_token == apns_token)
                 device.delete_instance(recursive=True)
             except Device.DoesNotExist:
                 return
+
+
+@bugsnag_client.capture()
+def send_notification(apns_token, *args, **kwargs):
+    payload = create_payload(*args, **kwargs)
+    send_payload(apns_token, payload)
