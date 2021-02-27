@@ -1,6 +1,8 @@
 import unittest
+
 from peewee import IntegrityError
-from palaverapi.models import database, Device, Token
+
+from palaverapi.models import Device, Token, database
 
 
 class DeviceTests(unittest.TestCase):

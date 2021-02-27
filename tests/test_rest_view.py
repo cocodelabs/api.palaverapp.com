@@ -2,8 +2,8 @@ import unittest
 
 from rivr.http import Request, Response
 
-from palaverapi.rest_view import RESTView
 from palaverapi.responses import RESTResponse
+from palaverapi.rest_view import RESTView
 
 
 class RESTViewTestCase(unittest.TestCase):

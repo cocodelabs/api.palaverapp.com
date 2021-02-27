@@ -1,5 +1,5 @@
-import unittest
 import json
+import unittest
 
 from rivr.test import Client
 
