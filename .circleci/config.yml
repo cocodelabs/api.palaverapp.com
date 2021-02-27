@@ -17,11 +17,11 @@ jobs:
       - run:
           command: |
             sudo pip install pipenv
-            pipenv install
+            pipenv install --dev
       - run:
           command: pipenv run invoke syncdb
       - run:
-          command: pipenv run python -m unittest discover
+          command: pipenv run pytest
 
 workflows:
   version: 2
