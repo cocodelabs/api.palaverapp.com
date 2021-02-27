@@ -2,13 +2,14 @@ import unittest
 import json
 from rivr.test import Client
 
-from palaverapi.views import router, queue
+from palaverapi import app
+from palaverapi.views import queue
 from palaverapi.models import Device, Token
 
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = Client(router)
+        self.client = Client(app)
 
     def test_status(self):
         assert self.client.get('/').status_code == 204
@@ -125,7 +126,7 @@ class ViewTests(unittest.TestCase):
 
 class DeviceDetailViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = Client(router)
+        self.client = Client(app)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'
@@ -188,7 +189,7 @@ class DeviceDetailViewTests(unittest.TestCase):
 
 class AuthorisationListViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = Client(router)
+        self.client = Client(app)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'
@@ -345,7 +346,7 @@ class AuthorisationListViewTests(unittest.TestCase):
 
 class AuthorisationDetailViewTests(unittest.TestCase):
     def setUp(self):
-        self.client = Client(router)
+        self.client = Client(app)
 
         self.device = Device.create(
             apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf'

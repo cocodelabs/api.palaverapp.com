@@ -9,9 +9,7 @@ import redis
 from rq import Queue
 import peewee
 
-from rivr.router import Router
 from rivr.http import Http404, Response
-from rivr.middleware import ErrorWrapper
 
 from palaverapi.rest_view import RESTView
 from palaverapi.models import database, Device, Token
@@ -25,13 +23,6 @@ def handle_error(request, exception):
     logger.error(exception, exc_info=sys.exc_info())
     return ProblemResponse(500, 'Internal Server Error')
 
-
-router = Router()
-app = ErrorWrapper(
-    router,
-    custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
-    custom_500=handle_error,
-)
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 redis = redis.from_url(redis_url)
@@ -47,12 +38,10 @@ def is_redis_available():
     return True
 
 
-@router.register(r'^$')
 def index(request):
     return Response(status=204)
 
 
-@router.register(r'^health$')
 def status(request):
     if is_redis_available:
         return Response(
@@ -75,7 +64,6 @@ def status(request):
     )
 
 
-@router.register(r'^500$')
 def crash(request):
     raise RuntimeError("You are eaten by a grue")
 
@@ -121,9 +109,6 @@ class RegisterView(RESTView):
             },
             status=status,
         )
-
-
-router.register(r'^1/devices$', database(RegisterView.as_view()))
 
 
 class PermissionRequiredMixin(object):
@@ -192,9 +177,6 @@ class PushView(PermissionRequiredMixin, RESTView):
         )
 
         return Response(status=202)
-
-
-router.register(r'^1/push$', PushView.as_view())
 
 
 class DeviceDetailView(PermissionRequiredMixin, RESTView):
@@ -291,10 +273,3 @@ class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
         authorisation = self.get_authorisation(token_last_eight)
         authorisation.delete_instance()
         return Response(status=204)
-
-
-router.register(r'^device$', DeviceDetailView.as_view())
-router.register(r'^authorisations$', AuthorisationListView.as_view())
-router.register(
-    r'^authorisations/(?P<token_last_eight>[\w]+)$', AuthorisationDetailView.as_view()
-)

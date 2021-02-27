@@ -3,7 +3,7 @@ import logging
 
 from rivr.wsgi import WSGIHandler
 
-from palaverapi.views import app
+from palaverapi.urls import app
 
 logger = logging.getLogger('rivr.request')
 

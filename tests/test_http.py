@@ -3,7 +3,7 @@ import json
 
 from rivr.test import Client
 
-from palaverapi.views import app
+from palaverapi import app
 
 
 class HTTPTests(unittest.TestCase):
