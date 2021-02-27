@@ -1,9 +1,11 @@
 import os
+
 from apns2.client import APNsClient
 from apns2.errors import BadDeviceToken, Unregistered
 from apns2.payload import Payload
 from bugsnag import Client
-from palaverapi.models import database, Device
+
+from palaverapi.models import Device, database
 
 TOPIC = 'com.kylefuller.palaver'
 DIRECTORY = os.path.abspath(
@@ -73,7 +75,9 @@ def send_notification(
     elif message:
         alert['body'] = message
 
-    payload = Payload(alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id)
+    payload = Payload(
+        alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id
+    )
 
     apns_client.connect()
 

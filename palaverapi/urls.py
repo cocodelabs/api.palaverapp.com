@@ -3,17 +3,13 @@ from rivr.middleware import ErrorWrapper
 
 from palaverapi.models import database
 from palaverapi.responses import ProblemResponse
-from palaverapi.views import (
+from palaverapi.views import crash, handle_error, index, status
+from palaverapi.views.authorisation import (
     AuthorisationDetailView,
     AuthorisationListView,
-    DeviceDetailView,
-    PushView,
-    RegisterView,
-    crash,
-    handle_error,
-    index,
-    status,
 )
+from palaverapi.views.device import DeviceDetailView, RegisterView
+from palaverapi.views.push import PushView
 
 urls = Router(
     (r'^$', index),

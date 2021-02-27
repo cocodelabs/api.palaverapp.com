@@ -1,6 +1,5 @@
-from rivr_peewee import Database
 import peewee
-
+from rivr_peewee import Database
 
 database = Database()
 

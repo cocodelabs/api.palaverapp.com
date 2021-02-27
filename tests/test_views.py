@@ -3,7 +3,7 @@ import json
 from rivr.test import Client
 
 from palaverapi import app
-from palaverapi.views import queue
+from palaverapi.views.push import queue
 from palaverapi.models import Device, Token
 
 
