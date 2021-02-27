@@ -45,7 +45,7 @@ def test_push(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     assert len(enqueued) == 1
     assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
 
-    payload = create_payload(*(enqueued[0][1:]))
+    payload = create_payload(*(enqueued[0][2:]))
 
     assert payload.alert['title'] == 'doe'
     assert payload.alert['body'] == 'Hello World'
@@ -69,7 +69,7 @@ def test_push_channel_message(client: Client, token: Token, enqueued: List[Tuple
     assert len(enqueued) == 1
     assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
 
-    payload = create_payload(*(enqueued[0][1:]))
+    payload = create_payload(*(enqueued[0][2:]))
 
     assert payload.alert['title'] == 'doe'
     assert payload.alert['subtitle'] == '#example'
@@ -93,7 +93,7 @@ def test_push_private_message(client: Client, token: Token, enqueued: List[Tuple
     assert len(enqueued) == 1
     assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
 
-    payload = create_payload(*(enqueued[0][1:]))
+    payload = create_payload(*(enqueued[0][2:]))
 
     assert 'title' not in payload.alert
     assert 'subtitle' not in payload.alert

@@ -15,7 +15,7 @@ bugsnag_client = Client(asynchronous=False, install_sys_hook=False)
 apns_client = None
 
 
-def load_apns_client():
+def load_apns_client() -> APNsClient:
     global apns_client
 
     if apns_client is None:
@@ -27,7 +27,6 @@ def load_apns_client():
 
 
 def create_payload(
-    apns_token,
     message,
     sender,
     channel,
@@ -73,11 +72,15 @@ def create_payload(
         alert['body'] = message
 
     return Payload(
-        alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id
+        alert=alert,
+        sound=sound,
+        badge=badge,
+        custom=user_info,
+        thread_id=thread_id
     )
 
 
-def send_payload(apns_token, payload: Payload) -> None:
+def send_payload(apns_token: str, payload: Payload) -> None:
     apns_client = load_apns_client()
     apns_client.connect()
 
@@ -93,6 +96,6 @@ def send_payload(apns_token, payload: Payload) -> None:
 
 
 @bugsnag_client.capture()
-def send_notification(apns_token, *args, **kwargs) -> None:
+def send_notification(apns_token: str, *args, **kwargs) -> None:
     payload = create_payload(*args, **kwargs)
     send_payload(apns_token, payload)
