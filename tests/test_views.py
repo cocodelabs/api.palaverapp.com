@@ -8,13 +8,13 @@ from palaverapi.models import Device, Token
 
 
 class ViewTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = Client(app)
 
-    def test_status(self):
+    def test_status(self) -> None:
         assert self.client.get('/').status_code == 204
 
-    def test_register(self):
+    def test_register(self) -> None:
         response = self.client.post(
             '/1/devices',
             headers={'Content-Type': 'application/json'},
@@ -48,7 +48,7 @@ class ViewTests(unittest.TestCase):
         push_token.delete_instance()
         device.delete_instance()
 
-    def test_returns_200_when_re_registering(self):
+    def test_returns_200_when_re_registering(self) -> None:
         response = self.client.post(
             '/1/devices',
             headers={'Content-Type': 'application/json'},

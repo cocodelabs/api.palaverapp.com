@@ -2,32 +2,33 @@ import json
 import logging
 import sys
 
-from rivr.http import Response
+import redis
+from rivr.http import Request, Response
 
 from palaverapi.responses import ProblemResponse
-from palaverapi.views.push import redis
+from palaverapi.views.push import redis_client
 
 
-def handle_error(request, exception):
+def handle_error(request: Request, exception: Exception):
     logger = logging.getLogger('rivr.request')
     logger.error(exception, exc_info=sys.exc_info())
     return ProblemResponse(500, 'Internal Server Error')
 
 
-def is_redis_available():
+def is_redis_available() -> bool:
     try:
-        redis.ping()
+        redis_client.ping()
     except redis.exceptions.ConnectionError:
         return False
 
     return True
 
 
-def index(request):
+def index(request: Request) -> Response:
     return Response(status=204)
 
 
-def status(request):
+def status(request) -> Response:
     if is_redis_available:
         return Response(
             json.dumps(
@@ -49,5 +50,5 @@ def status(request):
     )
 
 
-def crash(request):
+def crash(request: Request) -> Response:
     raise RuntimeError("You are eaten by a grue")

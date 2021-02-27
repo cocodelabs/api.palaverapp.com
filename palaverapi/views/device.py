@@ -1,7 +1,7 @@
 import hashlib
 
 import peewee
-from rivr.http import Response
+from rivr.http import Request, Response
 from rivr.views import View
 
 from palaverapi.decorators import requires_body
@@ -12,7 +12,7 @@ from palaverapi.views.mixins import PermissionRequiredMixin
 
 class RegisterView(View):
     @requires_body
-    def post(self, request, attributes):
+    def post(self, request: Request, attributes) -> Response:
         apns_token = attributes['device_token']
         bytes_token = apns_token.encode('utf-8')
         push_token = hashlib.sha1(
@@ -56,7 +56,7 @@ class RegisterView(View):
 class DeviceDetailView(PermissionRequiredMixin, View):
     http_method_names = ['options', 'head', 'get', 'delete', 'patch']
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         device = self.token.device
         return RESTResponse(
             request,
@@ -66,13 +66,13 @@ class DeviceDetailView(PermissionRequiredMixin, View):
         )
 
     @requires_body
-    def patch(self, request, attributes):
+    def patch(self, request: Request, attributes) -> Response:
         device = self.token.device
         device.apns_token = attributes['apns_token']
         device.save()
         return Response(status=204)
 
-    def delete(self, request):
+    def delete(self, request: Request) -> Response:
         device = self.token.device
         device.delete_instance(recursive=True)
 

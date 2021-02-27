@@ -1,4 +1,7 @@
+from typing import Iterator, List, Tuple, Generator
+
 import pytest
+from rivr.test import Client
 
 from palaverapi.models import Device, Token
 from palaverapi.utils import create_payload
@@ -6,7 +9,7 @@ from palaverapi.views.push import queue
 
 
 @pytest.fixture
-def token():
+def token() -> Iterator[Token]:
     device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
     token = Token.create(device=device, token='valid', scope=Token.ALL_SCOPE)
 
@@ -17,7 +20,7 @@ def token():
 
 
 @pytest.fixture
-def enqueued():
+def enqueued() -> List[Tuple]:
     enqueued = []
 
     def enqueue(*args):
@@ -27,7 +30,7 @@ def enqueued():
     return enqueued
 
 
-def test_push(client, token, enqueued):
+def test_push(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -51,7 +54,7 @@ def test_push(client, token, enqueued):
     assert payload.sound == 'default'
 
 
-def test_push_channel_message(client, token, enqueued):
+def test_push_channel_message(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -75,7 +78,7 @@ def test_push_channel_message(client, token, enqueued):
     assert payload.sound == 'default'
 
 
-def test_push_private_message(client, token, enqueued):
+def test_push_private_message(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -99,7 +102,7 @@ def test_push_private_message(client, token, enqueued):
     assert payload.sound == 'default'
 
 
-def test_push_invalid_json(client, token, enqueued):
+def test_push_invalid_json(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -113,7 +116,7 @@ def test_push_invalid_json(client, token, enqueued):
     assert response.content == '{"title": "Invalid request body"}'
 
 
-def test_push_unsupported_content_type(client, token, enqueued):
+def test_push_unsupported_content_type(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -127,14 +130,14 @@ def test_push_unsupported_content_type(client, token, enqueued):
     assert response.content == '{"title": "Unsupported Media Type"}'
 
 
-def test_push_without_authorization(client):
+def test_push_without_authorization(client: Client) -> None:
     response = client.post('/1/push')
 
     assert response.status_code == 401
     assert response.content_type == 'application/problem+json'
 
 
-def test_push_with_invalid_authorization(client):
+def test_push_with_invalid_authorization(client: Client) -> None:
     response = client.post(
         '/1/push',
         headers={

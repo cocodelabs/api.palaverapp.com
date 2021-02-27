@@ -1,3 +1,7 @@
+from typing import Optional
+
+from rivr.http import Request, Response
+
 from palaverapi.models import Token
 from palaverapi.responses import ProblemResponse
 
@@ -5,10 +9,10 @@ from palaverapi.responses import ProblemResponse
 class PermissionRequiredMixin(object):
     scope_required = 'all'
 
-    def get_token(self):
+    def get_token(self) -> Optional[Token]:
         authorization = self.request.headers.get('AUTHORIZATION', None)
         if not authorization or (authorization and ' ' not in authorization):
-            return
+            return None
 
         if authorization:
             _, access_token = authorization.split(' ', 2)
@@ -26,10 +30,10 @@ class PermissionRequiredMixin(object):
             self.token.scope == 'all' or self.token.scope == self.scope_required
         )
 
-    def handle_no_permission(self):
+    def handle_no_permission(self) -> Response:
         return ProblemResponse(401, 'Unauthorized')
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: Request, *args, **kwargs) -> Response:
         self.request = request
 
         if not self.has_permission():

@@ -8,7 +8,7 @@ from palaverapi.models import Device, Token
 
 
 class DeviceDetailViewTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = Client(app)
 
         self.device = Device.create(
@@ -18,11 +18,11 @@ class DeviceDetailViewTests(unittest.TestCase):
             device=self.device, token='e4763f7165d73e2636cca9e', scope=Token.ALL_SCOPE
         )
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.token.delete_instance()
         self.device.delete_instance()
 
-    def test_get_device(self):
+    def test_get_device(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.http('GET', '/device', {}, headers)
 
@@ -33,7 +33,7 @@ class DeviceDetailViewTests(unittest.TestCase):
             '{"apns_token": "ec1752bd70320e4763f7165d73e2636cca9e25cf"}',
         )
 
-    def test_update_apns_token(self):
+    def test_update_apns_token(self) -> None:
         headers = {
             'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
             'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ class DeviceDetailViewTests(unittest.TestCase):
         device = Token.get(token=self.token.token).device
         self.assertEqual(device.apns_token, 'new_token')
 
-    def test_delete_device(self):
+    def test_delete_device(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.http('DELETE', '/device', headers=headers)
 
@@ -59,7 +59,7 @@ class DeviceDetailViewTests(unittest.TestCase):
         self.assertEqual(Token.select().count(), 0)
         self.assertEqual(Device.select().count(), 0)
 
-    def test_delete_device_push_token(self):
+    def test_delete_device_push_token(self) -> None:
         self.token.scope = Token.PUSH_SCOPE
         self.token.save()
 

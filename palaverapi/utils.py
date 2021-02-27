@@ -35,7 +35,7 @@ def create_payload(
     network=None,
     intent=None,
     private=False,
-):
+) -> Payload:
     query = None
 
     if channel:
@@ -77,7 +77,7 @@ def create_payload(
     )
 
 
-def send_payload(apns_token, payload):
+def send_payload(apns_token, payload: Payload) -> None:
     apns_client = load_apns_client()
     apns_client.connect()
 
@@ -93,6 +93,6 @@ def send_payload(apns_token, payload):
 
 
 @bugsnag_client.capture()
-def send_notification(apns_token, *args, **kwargs):
+def send_notification(apns_token, *args, **kwargs) -> None:
     payload = create_payload(*args, **kwargs)
     send_payload(apns_token, payload)

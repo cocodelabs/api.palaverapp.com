@@ -1,7 +1,8 @@
+from typing import Any, Dict
 import uuid
 
 import peewee
-from rivr.http import Http404, Response
+from rivr.http import Http404, Request, Response
 from rivr.views import View
 
 from palaverapi.decorators import requires_body
@@ -10,7 +11,7 @@ from palaverapi.responses import ProblemResponse, RESTResponse
 from palaverapi.views.mixins import PermissionRequiredMixin
 
 
-def serialise_authorisation(token):
+def serialise_authorisation(token: Token) -> Dict[str, Any]:
     return {
         'url': '/authorisations/{}'.format(token.token_last_eight),
         'token_last_eight': token.token_last_eight,
@@ -19,14 +20,14 @@ def serialise_authorisation(token):
 
 
 class AuthorisationListView(PermissionRequiredMixin, View):
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         tokens = Token.select().where(Token.device == self.token.device)
         return RESTResponse(
             request, [serialise_authorisation(token) for token in tokens]
         )
 
     @requires_body
-    def post(self, request, attributes):
+    def post(self, request: Request, attributes) -> Response:
         scopes = attributes.get('scopes', None)
         scope = Token.ALL_SCOPE
         if scopes and len(scopes) == 1:
@@ -59,9 +60,9 @@ class AuthorisationListView(PermissionRequiredMixin, View):
 
 
 class AuthorisationDetailView(PermissionRequiredMixin, View):
-    def get_authorisation(self, token_last_eight):
+    def get_authorisation(self, token_last_eight: str) -> Token:
         try:
-            return (
+            token = (
                 Token.select()
                 .where(
                     Token.device == self.token.device,
@@ -72,11 +73,13 @@ class AuthorisationDetailView(PermissionRequiredMixin, View):
         except Token.DoesNotExist:
             raise Http404()
 
-    def get(self, request, token_last_eight):
+        return token
+
+    def get(self, request: Request, token_last_eight: str) -> Response:
         authorisation = self.get_authorisation(token_last_eight)
         return RESTResponse(request, serialise_authorisation(authorisation))
 
-    def delete(self, request, token_last_eight):
+    def delete(self, request: Request, token_last_eight: str) -> Response:
         authorisation = self.get_authorisation(token_last_eight)
         authorisation.delete_instance()
         return Response(status=204)

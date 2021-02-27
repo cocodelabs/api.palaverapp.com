@@ -2,7 +2,7 @@ import os
 
 import peewee
 import redis
-from rivr.http import Response
+from rivr.http import Request, Response
 from rivr.views import View
 from rq import Queue
 
@@ -12,15 +12,15 @@ from palaverapi.utils import send_notification
 from palaverapi.views.mixins import PermissionRequiredMixin
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-redis = redis.from_url(redis_url)
-queue = Queue(connection=redis)
+redis_client = redis.from_url(redis_url)
+queue = Queue(connection=redis_client)
 
 
 class PushView(PermissionRequiredMixin, View):
     scope_required = 'push'
 
     @requires_body
-    def post(self, request, attributes):
+    def post(self, request: Request, attributes) -> Response:
         message = attributes.get('message', None)
         sender = attributes.get('sender', None)
         channel = attributes.get('channel', None)

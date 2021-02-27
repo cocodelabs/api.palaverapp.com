@@ -8,7 +8,7 @@ from palaverapi.models import Device, Token
 
 
 class AuthorisationListViewTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = Client(app)
 
         self.device = Device.create(
@@ -18,11 +18,11 @@ class AuthorisationListViewTests(unittest.TestCase):
             device=self.device, token='e4763f7165d73e2636cca9e', scope=Token.ALL_SCOPE
         )
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.token.delete_instance()
         self.device.delete_instance()
 
-    def test_list(self):
+    def test_list(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.get('/authorisations', {}, headers)
 
@@ -38,7 +38,7 @@ class AuthorisationListViewTests(unittest.TestCase):
             ],
         )
 
-    def test_create(self):
+    def test_create(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.post('/authorisations', headers=headers)
 
@@ -55,7 +55,7 @@ class AuthorisationListViewTests(unittest.TestCase):
         token = Token.select().where(Token.token == content['token']).get()
         token.delete_instance()
 
-    def test_create_with_scope(self):
+    def test_create_with_scope(self) -> None:
         headers = {
             'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
             'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ class AuthorisationListViewTests(unittest.TestCase):
         token = Token.select().where(Token.token == content['token']).get()
         token.delete_instance()
 
-    def test_create_with_token(self):
+    def test_create_with_token(self) -> None:
         headers = {
             'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
             'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ class AuthorisationListViewTests(unittest.TestCase):
         token = Token.select().where(Token.token == content['token']).get()
         token.delete_instance()
 
-    def test_create_with_token_collision(self):
+    def test_create_with_token_collision(self) -> None:
         device = Device.create(apns_token='apnstoken')
         token = Token.create(
             device=device,
@@ -129,7 +129,7 @@ class AuthorisationListViewTests(unittest.TestCase):
         token.delete_instance()
         device.delete_instance()
 
-    def test_returns_200_when_re_registering(self):
+    def test_returns_200_when_re_registering(self) -> None:
         headers = {
             'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
             'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ class AuthorisationListViewTests(unittest.TestCase):
 
 
 class AuthorisationDetailViewTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = Client(app)
 
         self.device = Device.create(
@@ -175,13 +175,13 @@ class AuthorisationDetailViewTests(unittest.TestCase):
             device=self.device, token='e4763f7165d73e2636cca9e', scope=Token.ALL_SCOPE
         )
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         if self.token:
             self.token.delete_instance()
 
         self.device.delete_instance()
 
-    def test_get(self):
+    def test_get(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.get('/authorisations/636cca9e', {}, headers)
 
@@ -195,7 +195,7 @@ class AuthorisationDetailViewTests(unittest.TestCase):
             },
         )
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.delete('/authorisations/636cca9e', {}, headers)
 

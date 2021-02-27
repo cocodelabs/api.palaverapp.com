@@ -1,23 +1,15 @@
-import json
-import unittest
-
 from rivr.test import Client
 
-from palaverapi import app
+
+def test_404(client: Client) -> None:
+    response = client.get('/404')
+    assert response.status_code == 404
+    assert response.content_type == 'application/problem+json'
+    assert response.content == '{"title": "Resource Not Found"}'
 
 
-class HTTPTests(unittest.TestCase):
-    def setUp(self):
-        self.client = Client(app)
-
-    def test_404(self):
-        response = self.client.get('/404')
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
-        self.assertEqual(response.content, '{"title": "Resource Not Found"}')
-
-    def test_500(self):
-        response = self.client.get('/500')
-        self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.headers['Content-Type'], 'application/problem+json')
-        self.assertEqual(response.content, '{"title": "Internal Server Error"}')
+def test_500(client: Client) -> None:
+    response = client.get('/500')
+    assert response.status_code == 500
+    assert response.content_type == 'application/problem+json'
+    assert response.content == '{"title": "Internal Server Error"}'

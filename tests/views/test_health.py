@@ -1,4 +1,7 @@
-def test_health(client):
+from rivr.test import Client
+
+
+def test_health(client: Client) -> None:
     response = client.get('/health')
 
     assert response.status_code == 200
