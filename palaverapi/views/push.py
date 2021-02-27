@@ -3,11 +3,11 @@ import os
 import peewee
 import redis
 from rivr.http import Response
+from rivr.views import View
 from rq import Queue
 
 from palaverapi.decorators import requires_body
 from palaverapi.responses import ProblemResponse
-from palaverapi.rest_view import RESTView
 from palaverapi.utils import send_notification
 from palaverapi.views.mixins import PermissionRequiredMixin
 
@@ -16,7 +16,7 @@ redis = redis.from_url(redis_url)
 queue = Queue(connection=redis)
 
 
-class PushView(PermissionRequiredMixin, RESTView):
+class PushView(PermissionRequiredMixin, View):
     scope_required = 'push'
 
     @requires_body

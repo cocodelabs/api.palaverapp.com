@@ -2,11 +2,11 @@ import uuid
 
 import peewee
 from rivr.http import Http404, Response
+from rivr.views import View
 
 from palaverapi.decorators import requires_body
 from palaverapi.models import Token, database
 from palaverapi.responses import ProblemResponse, RESTResponse
-from palaverapi.rest_view import RESTView
 from palaverapi.views.mixins import PermissionRequiredMixin
 
 
@@ -18,10 +18,12 @@ def serialise_authorisation(token):
     }
 
 
-class AuthorisationListView(PermissionRequiredMixin, RESTView):
+class AuthorisationListView(PermissionRequiredMixin, View):
     def get(self, request):
         tokens = Token.select().where(Token.device == self.token.device)
-        return [serialise_authorisation(token) for token in tokens]
+        return RESTResponse(
+            request, [serialise_authorisation(token) for token in tokens]
+        )
 
     @requires_body
     def post(self, request, attributes):
@@ -56,7 +58,7 @@ class AuthorisationListView(PermissionRequiredMixin, RESTView):
         return RESTResponse(request, attributes, status=status)
 
 
-class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
+class AuthorisationDetailView(PermissionRequiredMixin, View):
     def get_authorisation(self, token_last_eight):
         try:
             return (
@@ -72,7 +74,7 @@ class AuthorisationDetailView(PermissionRequiredMixin, RESTView):
 
     def get(self, request, token_last_eight):
         authorisation = self.get_authorisation(token_last_eight)
-        return serialise_authorisation(authorisation)
+        return RESTResponse(request, serialise_authorisation(authorisation))
 
     def delete(self, request, token_last_eight):
         authorisation = self.get_authorisation(token_last_eight)

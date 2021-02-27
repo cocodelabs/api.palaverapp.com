@@ -2,15 +2,15 @@ import hashlib
 
 import peewee
 from rivr.http import Response
+from rivr.views import View
 
 from palaverapi.decorators import requires_body
 from palaverapi.models import Device, Token, database
 from palaverapi.responses import RESTResponse
-from palaverapi.rest_view import RESTView
 from palaverapi.views.mixins import PermissionRequiredMixin
 
 
-class RegisterView(RESTView):
+class RegisterView(View):
     @requires_body
     def post(self, request, attributes):
         apns_token = attributes['device_token']
@@ -53,7 +53,7 @@ class RegisterView(RESTView):
         )
 
 
-class DeviceDetailView(PermissionRequiredMixin, RESTView):
+class DeviceDetailView(PermissionRequiredMixin, View):
     http_method_names = ['options', 'head', 'get', 'delete', 'patch']
 
     def get(self, request):
