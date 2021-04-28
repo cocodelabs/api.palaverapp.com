@@ -27,8 +27,8 @@ def token() -> Iterator[Token]:
 def enqueued() -> List[Tuple]:
     enqueued = []
 
-    def enqueue(*args):
-        enqueued.append(args)
+    def enqueue(func, args, ttl=None):
+        enqueued.append((func, *args))
 
     queue.enqueue = enqueue
     return enqueued

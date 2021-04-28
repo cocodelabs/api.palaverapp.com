@@ -18,7 +18,7 @@ redis_client = redis.from_url(redis_url)
 queue = Queue(connection=redis_client)
 
 
-def handle_request(attributes, token: Token) -> Response:
+def handle_request(attributes, token: Token, ttl: Optional[int]) -> Response:
     message = attributes.get('message', None)
     sender = attributes.get('sender', None)
     channel = attributes.get('channel', None)
@@ -36,14 +36,17 @@ def handle_request(attributes, token: Token) -> Response:
 
     queue.enqueue(
         send_notification,
-        token.device.apns_token,
-        message,
-        sender,
-        channel,
-        badge,
-        network,
-        intent,
-        private,
+        ttl=ttl,
+        args=(
+            token.device.apns_token,
+            message,
+            sender,
+            channel,
+            badge,
+            network,
+            intent,
+            private,
+        ),
     )
 
     return Response(status=202)
@@ -83,7 +86,7 @@ class PushViewRFC(View):
         if urgency and urgency != 'normal':
             return ProblemResponse(400, f'Urgency {urgency} is unsupported.')
 
-        return handle_request(attributes, token)
+        return handle_request(attributes, token, ttl)
 
 
 class PushView(PermissionRequiredMixin, View):
@@ -95,4 +98,4 @@ class PushView(PermissionRequiredMixin, View):
         if not token:
             return ProblemResponse(401, 'Unauthorized')
 
-        return handle_request(attributes, token)
+        return handle_request(attributes, token, None)
