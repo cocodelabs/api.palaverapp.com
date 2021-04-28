@@ -54,7 +54,30 @@ def test_push(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     assert payload.sound == 'default'
 
 
-def test_push_channel_message(client: Client, token: Token, enqueued: List[Tuple]) -> None:
+def test_push_reset_badge(client: Client, token: Token, enqueued: List[Tuple]) -> None:
+    response = client.post(
+        '/1/push',
+        headers={
+            'Authorization': 'Bearer valid',
+            'Content-Type': 'application/json',
+        },
+        body=b'{"badge": 0}',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert == {}
+    assert payload.badge == 0
+
+
+def test_push_channel_message(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -78,7 +101,9 @@ def test_push_channel_message(client: Client, token: Token, enqueued: List[Tuple
     assert payload.sound == 'default'
 
 
-def test_push_private_message(client: Client, token: Token, enqueued: List[Tuple]) -> None:
+def test_push_private_message(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
     response = client.post(
         '/1/push',
         headers={
@@ -102,6 +127,22 @@ def test_push_private_message(client: Client, token: Token, enqueued: List[Tuple
     assert payload.sound == 'default'
 
 
+def test_push_empty_payload(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/1/push',
+        headers={
+            'Authorization': 'Bearer valid',
+            'Content-Type': 'application/json',
+        },
+        body=b'{}',
+    )
+
+    assert response.status_code == 422
+    assert len(enqueued) == 0
+
+
 def test_push_invalid_json(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     response = client.post(
         '/1/push',
@@ -116,7 +157,9 @@ def test_push_invalid_json(client: Client, token: Token, enqueued: List[Tuple]) 
     assert response.content == '{"title": "Invalid request body"}'
 
 
-def test_push_unsupported_content_type(client: Client, token: Token, enqueued: List[Tuple]) -> None:
+def test_push_unsupported_content_type(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
     response = client.post(
         '/1/push',
         headers={

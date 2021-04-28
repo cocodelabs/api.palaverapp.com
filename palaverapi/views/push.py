@@ -33,6 +33,15 @@ class PushView(PermissionRequiredMixin, View):
         if not token:
             return ProblemResponse(401, 'Unauthorized')
 
+        if (
+            'private' not in attributes
+            and 'badge' not in attributes
+            and 'message' not in attributes
+        ):
+            return ProblemResponse(
+                422, 'Missing payload, set private, badge or message'
+            )
+
         queue.enqueue(
             send_notification,
             token.device.apns_token,
