@@ -1,4 +1,4 @@
-from typing import Iterator, List, Tuple, Generator
+from typing import Generator, Iterator, List, Tuple
 
 import pytest
 from rivr.test import Client
@@ -12,10 +12,14 @@ from palaverapi.views.push import queue
 def token() -> Iterator[Token]:
     device = Device.create(apns_token='ec1752bd70320e4763f7165d73e2636cca9e25cf')
     token = Token.create(device=device, token='valid', scope=Token.ALL_SCOPE)
+    token2 = Token.create(
+        device=device, token='subscription-id', scope=Token.PUSH_SCOPE
+    )
 
     yield token
 
     token.delete_instance()
+    token2.delete_instance()
     device.delete_instance()
 
 
@@ -52,6 +56,186 @@ def test_push(client: Client, token: Token, enqueued: List[Tuple]) -> None:
     assert 'subtitle' not in payload.alert
     assert payload.badge == 1
     assert payload.sound == 'default'
+
+
+def test_push_with_subscription_uri(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': '5',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert['title'] == 'doe'
+    assert payload.alert['body'] == 'Hello World'
+    assert 'subtitle' not in payload.alert
+    assert payload.badge == 1
+    assert payload.sound == 'default'
+
+
+def test_push_with_subscription_uri_with_normal_urgency(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': '5',
+            'Urgency': 'normal',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert['title'] == 'doe'
+    assert payload.alert['body'] == 'Hello World'
+    assert 'subtitle' not in payload.alert
+    assert payload.badge == 1
+    assert payload.sound == 'default'
+
+
+def test_push_with_subscription_uri_with_unsupported_urgency(
+    client: Client, token: Token
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': '5',
+            'Urgency': 'low',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 400
+
+
+def test_push_with_subscription_uri_not_found(client: Client, token: Token) -> None:
+    response = client.post(
+        '/push/unknown',
+        headers={
+            'Content-Type': 'application/json',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 404
+
+
+def test_push_with_subscription_uri_with_all_token(
+    client: Client, token: Token
+) -> None:
+    response = client.post(
+        '/push/valid',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': '5',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 404
+
+
+def test_push_with_subscription_uri_without_ttl(client: Client, token: Token) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 400
+
+
+def test_push_with_subscription_uri_with_non_number_ttl(
+    client: Client, token: Token
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': 'five',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 400
+
+
+def test_push_with_subscription_uri_with_topic(client: Client, token: Token) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'Topic': 'test',
+            'TTL': '5',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 400
+
+
+def test_push_with_subscription_uri_with_prefer_async(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'Prefer': 'respond-async',
+            'TTL': '5',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert['title'] == 'doe'
+    assert payload.alert['body'] == 'Hello World'
+    assert 'subtitle' not in payload.alert
+    assert payload.badge == 1
+    assert payload.sound == 'default'
+
+
+def test_push_with_subscription_uri_with_prefer_unknown(
+    client: Client, token: Token
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'Prefer': 'respond-sync',
+            'TTL': '5',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 400
 
 
 def test_push_reset_badge(client: Client, token: Token, enqueued: List[Tuple]) -> None:

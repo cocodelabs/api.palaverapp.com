@@ -10,7 +10,7 @@ from palaverapi.responses import ProblemResponse
 
 def requires_body(func: Callable[..., Response]):
     @wraps(func)
-    def wrapper(self, request: Request) -> Response:
+    def wrapper(self, request: Request, *args, **kwargs) -> Response:
         if request.content_type:
             body = request.body.read()
             content_type = request.content_type.split(';')[0]
@@ -28,8 +28,8 @@ def requires_body(func: Callable[..., Response]):
             except (UnicodeDecodeError, ValueError):
                 return ProblemResponse(400, 'Invalid request body')
 
-            return func(self, request, payload)
+            return func(self, request, *args, payload, **kwargs)
 
-        return func(self, request, {})
+        return func(self, request, *args, {}, **kwargs)
 
     return wrapper

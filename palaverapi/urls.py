@@ -9,7 +9,7 @@ from palaverapi.views.authorisation import (
     AuthorisationListView,
 )
 from palaverapi.views.device import DeviceDetailView, RegisterView
-from palaverapi.views.push import PushView
+from palaverapi.views.push import PushView, PushViewRFC
 
 urls = Router(
     (r'^$', index),
@@ -17,6 +17,7 @@ urls = Router(
     (r'^500$', crash),
     (r'^1/devices$', database(RegisterView.as_view())),
     (r'^1/push$', PushView.as_view()),
+    (r'^push/(?P<subscription_id>[\w_-]+)$', PushViewRFC.as_view()),
     (r'^device$', DeviceDetailView.as_view()),
     (r'^authorisations$', AuthorisationListView.as_view()),
     (
