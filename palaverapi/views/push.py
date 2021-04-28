@@ -75,6 +75,10 @@ class PushViewRFC(View):
         if ttl < 0:
             return ProblemResponse(400, 'TTL must be a positive number')
 
+        if ttl == 0:
+            # rq requires >0 ttl
+            ttl = 1
+
         if 'Topic' in request.headers:
             return ProblemResponse(400, 'Topic is not supported. Remove Topic header.')
 
