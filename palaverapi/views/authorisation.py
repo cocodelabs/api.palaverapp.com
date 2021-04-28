@@ -1,5 +1,5 @@
-from typing import Any, Dict
 import uuid
+from typing import Any, Dict
 
 import peewee
 from rivr.http import Http404, Request, Response

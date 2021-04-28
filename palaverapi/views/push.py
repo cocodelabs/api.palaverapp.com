@@ -3,6 +3,7 @@ from typing import Optional
 
 import peewee
 import redis
+from apns2.client import NotificationPriority
 from rivr.http import Request, Response
 from rivr.views import View
 from rq import Queue
@@ -18,7 +19,12 @@ redis_client = redis.from_url(redis_url)
 queue = Queue(connection=redis_client)
 
 
-def handle_request(attributes, token: Token, ttl: Optional[int]) -> Response:
+def handle_request(
+    attributes,
+    token: Token,
+    ttl: Optional[int],
+    priority: Optional[NotificationPriority] = None,
+) -> Response:
     message = attributes.get('message', None)
     sender = attributes.get('sender', None)
     channel = attributes.get('channel', None)
@@ -47,6 +53,7 @@ def handle_request(attributes, token: Token, ttl: Optional[int]) -> Response:
             intent,
             private,
         ),
+        kwargs=dict(priority=priority),
     )
 
     return Response(status=202)
@@ -86,11 +93,17 @@ class PushViewRFC(View):
         if prefer and prefer != 'respond-async':
             return ProblemResponse(400, f'Prefer {prefer} is unsupported.')
 
-        urgency = request.headers['Urgency']
-        if urgency and urgency != 'normal':
+        urgency = request.headers.get('Urgency', 'normal')
+        if urgency not in ('low', 'normal'):
             return ProblemResponse(400, f'Urgency {urgency} is unsupported.')
 
-        return handle_request(attributes, token, ttl)
+        priority: NotificationPriority
+        if urgency == 'low':
+            priority = NotificationPriority.Delayed
+        else:
+            priority = NotificationPriority.Immediate
+
+        return handle_request(attributes, token, ttl, priority=priority)
 
 
 class PushView(PermissionRequiredMixin, View):

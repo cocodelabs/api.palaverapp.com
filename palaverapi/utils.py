@@ -1,6 +1,7 @@
 import os
+from typing import Optional
 
-from apns2.client import APNsClient
+from apns2.client import APNsClient, NotificationPriority
 from apns2.errors import BadDeviceToken, Unregistered
 from apns2.payload import Payload
 from bugsnag import Client
@@ -72,20 +73,23 @@ def create_payload(
         alert['body'] = message
 
     return Payload(
-        alert=alert,
-        sound=sound,
-        badge=badge,
-        custom=user_info,
-        thread_id=thread_id
+        alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id
     )
 
 
-def send_payload(apns_token: str, payload: Payload) -> None:
+def send_payload(
+    apns_token: str, payload: Payload, priority: Optional[NotificationPriority] = None
+) -> None:
     apns_client = load_apns_client()
     apns_client.connect()
 
     try:
-        apns_client.send_notification(apns_token, payload, TOPIC)
+        apns_client.send_notification(
+            apns_token,
+            payload,
+            TOPIC,
+            priority=priority or NotificationPriority.Immediate,
+        )
     except (BadDeviceToken, Unregistered):
         with database.transaction():
             try:
@@ -96,6 +100,8 @@ def send_payload(apns_token: str, payload: Payload) -> None:
 
 
 @bugsnag_client.capture()
-def send_notification(apns_token: str, *args, **kwargs) -> None:
+def send_notification(
+    apns_token: str, *args, priority: Optional[NotificationPriority] = None, **kwargs
+) -> None:
     payload = create_payload(*args, **kwargs)
-    send_payload(apns_token, payload)
+    send_payload(apns_token, payload, priority=priority)

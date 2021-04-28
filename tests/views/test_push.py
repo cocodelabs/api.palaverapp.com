@@ -27,7 +27,7 @@ def token() -> Iterator[Token]:
 def enqueued() -> List[Tuple]:
     enqueued = []
 
-    def enqueue(func, args, ttl=None):
+    def enqueue(func, args, ttl=None, kwargs=None):
         enqueued.append((func, *args))
 
     queue.enqueue = enqueue
@@ -84,6 +84,33 @@ def test_push_with_subscription_uri(
     assert payload.sound == 'default'
 
 
+def test_push_with_subscription_uri_with_low_urgency(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/json',
+            'TTL': '5',
+            'Urgency': 'low',
+        },
+        body=b'{"sender": "doe", "message": "Hello World"}',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert['title'] == 'doe'
+    assert payload.alert['body'] == 'Hello World'
+    assert 'subtitle' not in payload.alert
+    assert payload.badge == 1
+    assert payload.sound == 'default'
+
+
 def test_push_with_subscription_uri_with_normal_urgency(
     client: Client, token: Token, enqueued: List[Tuple]
 ) -> None:
@@ -119,7 +146,7 @@ def test_push_with_subscription_uri_with_unsupported_urgency(
         headers={
             'Content-Type': 'application/json',
             'TTL': '5',
-            'Urgency': 'low',
+            'Urgency': 'very-low',
         },
         body=b'{"sender": "doe", "message": "Hello World"}',
     )
