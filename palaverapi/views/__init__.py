@@ -5,6 +5,7 @@ import sys
 import redis
 from rivr.http import Request, Response
 
+from palaverapi.models import database
 from palaverapi.responses import ProblemResponse
 from palaverapi.views.push import redis_client
 
@@ -24,12 +25,22 @@ def is_redis_available() -> bool:
     return True
 
 
+def is_database_available() -> bool:
+    try:
+        database.connect()
+    except Exception:
+        return False
+
+    database.close()
+    return True
+
+
 def index(request: Request) -> Response:
     return Response(status=204)
 
 
 def status(request) -> Response:
-    if is_redis_available:
+    if is_redis_available and is_database_available:
         return Response(
             json.dumps(
                 {
