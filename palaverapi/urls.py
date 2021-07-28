@@ -15,7 +15,7 @@ urls = Router(
     (r'^$', index),
     (r'^health$', status),
     (r'^500$', crash),
-    (r'^1/devices$', database(RegisterView.as_view())),
+    (r'^1/devices$', RegisterView.as_view()),
     (r'^1/push$', PushView.as_view()),
     (r'^push/(?P<subscription_id>[\w_-]+)$', PushViewRFC.as_view()),
     (r'^device$', DeviceDetailView.as_view()),
@@ -28,7 +28,7 @@ urls = Router(
 
 
 app = ErrorWrapper(
-    urls,
+    database(urls),
     custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
     custom_500=handle_error,
 )
