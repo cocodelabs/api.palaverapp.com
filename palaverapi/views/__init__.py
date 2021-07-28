@@ -26,13 +26,7 @@ def is_redis_available() -> bool:
 
 
 def is_database_available() -> bool:
-    try:
-        database.connect()
-    except Exception:
-        return False
-
-    database.close()
-    return True
+    return not database.database.is_closed()
 
 
 def index(request: Request) -> Response:
@@ -40,7 +34,7 @@ def index(request: Request) -> Response:
 
 
 def status(request) -> Response:
-    if is_redis_available and is_database_available:
+    if is_redis_available() and is_database_available():
         return Response(
             json.dumps(
                 {

@@ -1,5 +1,23 @@
+import os
 import peewee
 from rivr_peewee import Database
+
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgres+pool://')
+
+    # disable auto connection
+    EXTRA_OPTIONS = 'autoconnect=false'
+
+    if '?' in DATABASE_URL:
+        DATABASE_URL += '&' + EXTRA_OPTIONS
+    else:
+        DATABASE_URL += '?' + EXTRA_OPTIONS
+
+    os.environ['DATABASE_URL'] = DATABASE_URL
+
+
 
 database = Database()
 
