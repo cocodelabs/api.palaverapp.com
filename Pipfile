@@ -7,7 +7,7 @@ verify_ssl = true
 pytest = "*"
 
 [packages]
-apns2 = "==0.7.1"
+apns2 = {editable = true, git = "https://github.com/Pr0Ger/PyAPNs2.git"}
 bugsnag = "==4.1.0"
 cryptography = "==3.3.2"
 gunicorn = "==20.1.0"

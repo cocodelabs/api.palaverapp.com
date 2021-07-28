@@ -20,18 +20,6 @@ def syncdb(context):
     Token.create_table()
 
 
-@task
-def upload_certs(context):
-    with open('certificates/private.pem') as fp:
-        priv_key = fp.read()
-
-    with open('certificates/public.pem') as fp:
-        pub_key = fp.read()
-
-    run('heroku config:add "APNS_PRIVATE_KEY={}" --app palaverapi'.format(priv_key))
-    run('heroku config:add "APNS_PUBLIC_KEY={}" --app palaverapi'.format(pub_key))
-
-
 def configure_db():
     database_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), 'tests.sqlite'

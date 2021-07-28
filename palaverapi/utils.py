@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 from apns2.client import APNsClient, NotificationPriority
+from apns2.credentials import TokenCredentials
 from apns2.errors import BadDeviceToken, Unregistered
 from apns2.payload import Payload
 from bugsnag import Client
@@ -9,20 +10,23 @@ from bugsnag import Client
 from palaverapi.models import Device, database
 
 TOPIC = 'com.kylefuller.palaver'
-DIRECTORY = os.path.abspath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'certificates')
+KEYS_DIRECTORY = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys')
 )
+AUTH_KEY_ID = os.environ.get('APNS_AUTH_KEY_ID')
+TEAM_ID = os.environ.get('APNS_TEAM_ID')
 bugsnag_client = Client(asynchronous=False, install_sys_hook=False)
 apns_client = None
 
 
 def load_apns_client() -> APNsClient:
     global apns_client
-
     if apns_client is None:
-        apns_client = APNsClient(
-            os.path.join(DIRECTORY, 'production.pem'), heartbeat_period=30
+        auth_key_path = os.path.join(KEYS_DIRECTORY, f'{AUTH_KEY_ID}.pem')
+        token_credentials = TokenCredentials(
+            auth_key_path=auth_key_path, auth_key_id=AUTH_KEY_ID, team_id=TEAM_ID
         )
+        apns_client = APNsClient(credentials=token_credentials, heartbeat_period=30)
 
     return apns_client
 
