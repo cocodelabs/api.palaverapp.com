@@ -9,7 +9,7 @@ pytest = "*"
 [packages]
 apns2 = {editable = true, git = "https://github.com/Pr0Ger/PyAPNs2.git"}
 bugsnag = "==4.1.0"
-cryptography = "==3.3.2"
+cryptography = "==3.4.7"
 gunicorn = "==20.1.0"
 invoke = "==1.5.0"
 peewee = "==3.14.4"
