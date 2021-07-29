@@ -1,15 +1,14 @@
 from rivr import Router
-from rivr.middleware import ErrorWrapper
 
-from palaverapi.models import database
-from palaverapi.responses import ProblemResponse
-from palaverapi.views import crash, handle_error, index, status
+from palaverapi.views import crash, index, status
 from palaverapi.views.authorisation import (
     AuthorisationDetailView,
     AuthorisationListView,
 )
 from palaverapi.views.device import DeviceDetailView, RegisterView
 from palaverapi.views.push import PushView, PushViewRFC
+
+__all__ = ['urls']
 
 urls = Router(
     (r'^$', index),
@@ -24,11 +23,4 @@ urls = Router(
         r'^authorisations/(?P<token_last_eight>[\w]+)$',
         AuthorisationDetailView.as_view(),
     ),
-)
-
-
-app = ErrorWrapper(
-    database(urls),
-    custom_404=lambda request, e: ProblemResponse(404, 'Resource Not Found'),
-    custom_500=handle_error,
 )

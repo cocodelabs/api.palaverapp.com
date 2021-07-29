@@ -10,10 +10,14 @@ from palaverapi.responses import ProblemResponse
 from palaverapi.views.push import redis_client
 
 
-def handle_error(request: Request, exception: Exception):
+def handle_error(request: Request, exception: Exception) -> Response:
     logger = logging.getLogger('rivr.request')
     logger.error(exception, exc_info=sys.exc_info())
     return ProblemResponse(500, 'Internal Server Error')
+
+
+def handle_not_found(request: Request, exception: Exception) -> Response:
+    return ProblemResponse(404, 'Resource Not Found')
 
 
 def is_redis_available() -> bool:
