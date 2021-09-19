@@ -84,6 +84,33 @@ def test_push_with_subscription_uri(
     assert payload.sound == 'default'
 
 
+def test_push_with_subscription_uri_text_irc(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'text/irc',
+            'TTL': '5',
+        },
+        body=b':doe!~doe@example.com PRIVMSG #example :Hello World\r\n',
+    )
+
+    assert response.status_code == 202
+
+    assert len(enqueued) == 1
+    assert enqueued[0][1] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+
+    payload = create_payload(*(enqueued[0][2:]))
+
+    assert payload.alert
+    assert payload.alert['title'] == 'doe'
+    assert payload.alert['subtitle'] == '#example'
+    assert payload.alert['body'] == 'Hello World'
+    assert payload.badge == 1
+    assert payload.sound == 'default'
+
+
 def test_push_with_subscription_uri_with_low_urgency(
     client: Client, token: Token, enqueued: List[Tuple]
 ) -> None:
@@ -152,6 +179,21 @@ def test_push_with_subscription_uri_with_unsupported_urgency(
     )
 
     assert response.status_code == 400
+
+
+def test_push_with_subscription_uri_unsupported_media_type(
+    client: Client, token: Token, enqueued: List[Tuple]
+) -> None:
+    response = client.post(
+        '/push/subscription-id',
+        headers={
+            'Content-Type': 'application/yaml',
+            'TTL': '5',
+        },
+        body=b'message: Hello World',
+    )
+
+    assert response.status_code == 415
 
 
 def test_push_with_subscription_uri_not_found(client: Client, token: Token) -> None:

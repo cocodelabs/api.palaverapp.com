@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Optional
 
@@ -9,6 +10,7 @@ from rivr.views import View
 from rq import Queue
 
 from palaverapi.decorators import requires_body
+from palaverapi.message import Message
 from palaverapi.models import Token
 from palaverapi.responses import ProblemResponse
 from palaverapi.utils import send_notification
@@ -60,8 +62,44 @@ def handle_request(
 
 
 class PushViewRFC(View):
-    @requires_body
-    def post(self, request: Request, attributes, subscription_id: str) -> Response:
+    def post(self, request: Request, subscription_id: str) -> Response:
+        content_type = (request.content_type or 'application/octet-stream').split(';')[0]
+
+        if content_type == 'application/json':
+            body = request.body.read()
+            content = body.decode('utf-8')
+            attributes = json.loads(content)
+        elif content_type == 'text/irc':
+            body = request.body.read()
+
+            # FIXME assuming utf-8 charset, check parameters
+            content = body.decode('utf-8').strip()
+
+            message = Message.parse(content)
+            if message.command not in ('PRIVMSG', 'NOTICE'):
+                return ProblemResponse(400, f'Command {message.command} is not supported')
+
+            if len(message.parameters) != 2:
+                return ProblemResponse(400, f'{message.command} takes two parameters')
+
+            attributes = {
+                'message': message.get(1),
+            }
+
+            if message.prefix:
+                attributes['sender'] = message.prefix.partition('!')[0]
+
+            target = message.get(0)
+            if target and target.startswith('#'):
+                # no access to 005 assume # is only channel prefix
+                attributes['channel'] = target
+
+            if message.prefix:
+                attributes['sender'] = message.prefix.partition('!')[0]
+
+        else:
+            return ProblemResponse(415, f'Unsupported media type {content_type}')
+
         try:
             token = Token.get(token=subscription_id)
         except Token.DoesNotExist:
