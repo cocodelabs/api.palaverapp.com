@@ -66,6 +66,9 @@ class DeviceDetailView(PermissionRequiredMixin, View):
         if device.created_at:
             device_detail['created_at'] = device.created_at.isoformat() + 'Z'
 
+        if device.updated_at:
+            device_detail['updated_at'] = device.updated_at.isoformat() + 'Z'
+
         return RESTResponse(request, device_detail)
 
     @requires_body

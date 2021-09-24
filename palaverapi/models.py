@@ -25,9 +25,14 @@ database = Database()
 class Device(database.Model):
     apns_token = peewee.CharField(max_length=64, unique=True)
     created_at = peewee.DateTimeField(default=datetime.datetime.utcnow, null=True)
+    updated_at = peewee.DateTimeField(default=datetime.datetime.utcnow, null=True)
 
     def __repr__(self) -> str:
         return '<Device {}>'.format(self.apns_token)
+
+    def save(self, *args, **kwargs) -> None:
+        self.updated_at = datetime.datetime.utcnow()
+        super(Device, self).save(*args, **kwargs)
 
 
 class Token(database.Model):

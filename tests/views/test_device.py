@@ -30,13 +30,15 @@ class DeviceDetailViewTests(unittest.TestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
 
         device_detail = json.loads(response.content)
-        assert sorted(device_detail.keys()) == ['apns_token', 'created_at']
+        assert sorted(device_detail.keys()) == ['apns_token', 'created_at', 'updated_at']
         assert device_detail['apns_token'] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
         assert device_detail['created_at'].endswith('Z')
+        assert device_detail['updated_at'].endswith('Z')
 
     def test_get_device_without_created_at(self) -> None:
         self.device.created_at = None
-        self.device.save()
+        self.device.updated_at = None
+        super(Device, self.device).save()
 
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
         response = self.client.http('GET', '/device', {}, headers)
@@ -49,6 +51,7 @@ class DeviceDetailViewTests(unittest.TestCase):
         assert device_detail['apns_token'] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
 
     def test_update_apns_token(self) -> None:
+        last_updated = self.device.updated_at
         headers = {
             'AUTHORIZATION': 'token e4763f7165d73e2636cca9e',
             'Content-Type': 'application/json',
@@ -64,6 +67,7 @@ class DeviceDetailViewTests(unittest.TestCase):
 
         device = Token.get(token=self.token.token).device
         self.assertEqual(device.apns_token, 'new_token')
+        assert device.updated_at != last_updated
 
     def test_delete_device(self) -> None:
         headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
