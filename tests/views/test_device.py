@@ -28,10 +28,25 @@ class DeviceDetailViewTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
-        self.assertEqual(
-            response.content,
-            '{"apns_token": "ec1752bd70320e4763f7165d73e2636cca9e25cf"}',
-        )
+
+        device_detail = json.loads(response.content)
+        assert sorted(device_detail.keys()) == ['apns_token', 'created_at']
+        assert device_detail['apns_token'] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
+        assert device_detail['created_at'].endswith('Z')
+
+    def test_get_device_without_created_at(self) -> None:
+        self.device.created_at = None
+        self.device.save()
+
+        headers = {'AUTHORIZATION': 'token e4763f7165d73e2636cca9e'}
+        response = self.client.http('GET', '/device', {}, headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+
+        device_detail = json.loads(response.content)
+        assert sorted(device_detail.keys()) == ['apns_token']
+        assert device_detail['apns_token'] == 'ec1752bd70320e4763f7165d73e2636cca9e25cf'
 
     def test_update_apns_token(self) -> None:
         headers = {

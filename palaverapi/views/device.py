@@ -58,12 +58,15 @@ class DeviceDetailView(PermissionRequiredMixin, View):
 
     def get(self, request: Request) -> Response:
         device = self.token.device
-        return RESTResponse(
-            request,
-            {
-                'apns_token': device.apns_token,
-            },
-        )
+
+        device_detail = {
+            'apns_token': device.apns_token,
+        }
+
+        if device.created_at:
+            device_detail['created_at'] = device.created_at.isoformat() + 'Z'
+
+        return RESTResponse(request, device_detail)
 
     @requires_body
     def patch(self, request: Request, attributes) -> Response:
