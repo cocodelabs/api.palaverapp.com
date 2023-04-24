@@ -4,7 +4,7 @@ from typing import Optional
 
 import peewee
 import redis
-from apns2.client import NotificationPriority
+from aioapns import PRIORITY_NORMAL, PRIORITY_HIGH
 from rivr.http import Request, Response
 from rivr.views import View
 from rq import Queue
@@ -25,7 +25,7 @@ def handle_request(
     attributes,
     token: Token,
     ttl: Optional[int],
-    priority: Optional[NotificationPriority] = None,
+    priority: Optional[str] = None,
 ) -> Response:
     message = attributes.get('message', None)
     sender = attributes.get('sender', None)
@@ -135,11 +135,11 @@ class PushViewRFC(View):
         if urgency not in ('low', 'normal'):
             return ProblemResponse(400, f'Urgency {urgency} is unsupported.')
 
-        priority: NotificationPriority
+        priority: str
         if urgency == 'low':
-            priority = NotificationPriority.Delayed
+            priority = PRIORITY_NORMAL
         else:
-            priority = NotificationPriority.Immediate
+            priority = PRIORITY_HIGH
 
         return handle_request(attributes, token, ttl, priority=priority)
 

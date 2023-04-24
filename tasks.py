@@ -1,4 +1,5 @@
 import os
+import asyncio
 from threading import Thread
 from invoke import run, task
 from time import sleep
@@ -50,16 +51,18 @@ def test_blueprint(context):
 
 @task
 def cleanup(context):
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_cleanup(context))
+
+async def _cleanup(context):
     import sys
     import math
     from palaverapi.utils import load_apns_client, TOPIC
     from palaverapi.models import Device
-    from apns2.errors import BadDeviceToken, Unregistered
-    from apns2.payload import Payload
+    from aioapns import NotificationRequest, PushType, PRIORITY_NORMAL
+    from aioapns.common import APNS_RESPONSE_CODE
 
     apns_client = load_apns_client()
-
-    payload = Payload()  # No alert is shown to recipient if payload is empty.
 
     stepsize = 500
     total = Device.select().count()
@@ -77,11 +80,18 @@ def cleanup(context):
         devices = Device.select().limit(stepsize).offset(i * stepsize).execute()
 
         for device in devices:
-            try:
-                client.send_notification(device.apns_token, payload, TOPIC)
-            except (BadDeviceToken, Unregistered) as e:
+            request = NotificationRequest(
+                device_token=device.apns_token,
+                message={ 'aps': {} },
+                push_type=PushType.BACKGROUND,  # No alert is shown to recipient if push type is background
+                priority=PRIORITY_NORMAL
+            )
+            response = await apns_client.send_notification(request)
+            if response.description in ['BadDeviceToken', 'Unregistered']:
                 device.delete_instance(recursive=True)
                 removed_devices += 1
+            elif not response.is_successful:
+                raise Exception('Unsuccesful APNS request', response.description)
 
         sleep(10)
 

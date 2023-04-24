@@ -51,11 +51,11 @@ def test_push(client: Client, token: Token, enqueued: List[Tuple]) -> None:
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['body'] == 'Hello World'
-    assert 'subtitle' not in payload.alert
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['body'] == 'Hello World'
+    assert 'subtitle' not in payload['alert']
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri(
@@ -77,11 +77,11 @@ def test_push_with_subscription_uri(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['body'] == 'Hello World'
-    assert 'subtitle' not in payload.alert
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['body'] == 'Hello World'
+    assert 'subtitle' not in payload['alert']
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri_text_irc(
@@ -131,11 +131,11 @@ def test_push_with_subscription_uri_with_low_urgency(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['body'] == 'Hello World'
-    assert 'subtitle' not in payload.alert
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['body'] == 'Hello World'
+    assert 'subtitle' not in payload['alert']
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri_with_normal_urgency(
@@ -158,11 +158,11 @@ def test_push_with_subscription_uri_with_normal_urgency(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['body'] == 'Hello World'
-    assert 'subtitle' not in payload.alert
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['body'] == 'Hello World'
+    assert 'subtitle' not in payload['alert']
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri_with_unsupported_urgency(
@@ -284,11 +284,11 @@ def test_push_with_subscription_uri_with_prefer_async(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['body'] == 'Hello World'
-    assert 'subtitle' not in payload.alert
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['body'] == 'Hello World'
+    assert 'subtitle' not in payload['alert']
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri_with_prefer_unknown(
@@ -324,8 +324,8 @@ def test_push_reset_badge(client: Client, token: Token, enqueued: List[Tuple]) -
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert == {}
-    assert payload.badge == 0
+    assert payload['alert'] == {}
+    assert payload['badge'] == 0
 
 
 def test_push_channel_message(
@@ -347,11 +347,11 @@ def test_push_channel_message(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['subtitle'] == '#example'
-    assert payload.alert['body'] == 'Hello World'
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['subtitle'] == '#example'
+    assert payload['alert']['body'] == 'Hello World'
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_private_message(
@@ -373,11 +373,11 @@ def test_push_private_message(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert 'title' not in payload.alert
-    assert 'subtitle' not in payload.alert
-    assert payload.alert['body'] == 'Message'
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert 'title' not in payload['alert']
+    assert 'subtitle' not in payload['alert']
+    assert payload['alert']['body'] == 'Message'
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_empty_payload(

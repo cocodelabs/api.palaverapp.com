@@ -1,10 +1,8 @@
 import os
 from typing import Optional
 
-from apns2.client import APNsClient, NotificationPriority
-from apns2.credentials import TokenCredentials
-from apns2.errors import BadDeviceToken, Unregistered
-from apns2.payload import Payload
+from aioapns import APNs, NotificationRequest, PushType, PRIORITY_HIGH
+from aioapns.common import APNS_RESPONSE_CODE
 from bugsnag import Client
 
 from palaverapi.models import Device, database
@@ -19,14 +17,17 @@ bugsnag_client = Client(asynchronous=False, install_sys_hook=False)
 apns_client = None
 
 
-def load_apns_client() -> APNsClient:
+def load_apns_client() -> APNs:
     global apns_client
     if apns_client is None:
         auth_key_path = os.path.join(KEYS_DIRECTORY, f'{AUTH_KEY_ID}.pem')
-        token_credentials = TokenCredentials(
-            auth_key_path=auth_key_path, auth_key_id=AUTH_KEY_ID, team_id=TEAM_ID
+        apns_client = APNs(
+            key_id=AUTH_KEY_ID,
+            key=auth_key_path,
+            team_id=TEAM_ID,
+            topic=TOPIC,
+            use_sandbox=False,
         )
-        apns_client = APNsClient(credentials=token_credentials, heartbeat_period=30)
 
     return apns_client
 
@@ -39,7 +40,7 @@ def create_payload(
     network=None,
     intent=None,
     private=False,
-) -> Payload:
+) -> dict:
     query = None
 
     if channel:
@@ -76,36 +77,41 @@ def create_payload(
     elif message:
         alert['body'] = message
 
-    return Payload(
-        alert=alert, sound=sound, badge=badge, custom=user_info, thread_id=thread_id
-    )
+    return {
+        'alert': alert,
+        'sound': sound,
+        'badge': badge,
+        'thread_id': thread_id,
+        **user_info
+    }
 
 
-def send_payload(
-    apns_token: str, payload: Payload, priority: Optional[NotificationPriority] = None
+async def send_payload(
+    apns_token: str, payload: dict, priority: Optional[str] = None
 ) -> None:
     apns_client = load_apns_client()
-    apns_client.connect()
 
-    try:
-        apns_client.send_notification(
-            apns_token,
-            payload,
-            TOPIC,
-            priority=priority or NotificationPriority.Immediate,
-        )
-    except (BadDeviceToken, Unregistered):
+    request = NotificationRequest(
+        device_token=apns_token,
+        message={ 'aps': payload },
+        push_type=PushType.ALERT,
+        priority=priority or PRIORITY_HIGH
+    )
+    response = await apns_client.send_notification(request)
+    if response.description in ['BadDeviceToken', 'Unregistered']:
         with database.transaction():
             try:
                 device = Device.get(Device.apns_token == apns_token)
                 device.delete_instance(recursive=True)
             except Device.DoesNotExist:
                 return
+    elif not response.is_successful:
+        raise Exception('Unsuccesful APNS request', response.description)
 
 
 @bugsnag_client.capture()
-def send_notification(
-    apns_token: str, *args, priority: Optional[NotificationPriority] = None, **kwargs
+async def send_notification(
+    apns_token: str, *args, priority: Optional[str] = None, **kwargs
 ) -> None:
     payload = create_payload(*args, **kwargs)
-    send_payload(apns_token, payload, priority=priority)
+    await send_payload(apns_token, payload, priority=priority)
