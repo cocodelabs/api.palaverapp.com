@@ -103,12 +103,12 @@ def test_push_with_subscription_uri_text_irc(
 
     payload = create_payload(*(enqueued[0][2:]))
 
-    assert payload.alert
-    assert payload.alert['title'] == 'doe'
-    assert payload.alert['subtitle'] == '#example'
-    assert payload.alert['body'] == 'Hello World'
-    assert payload.badge == 1
-    assert payload.sound == 'default'
+    assert 'alert' in payload
+    assert payload['alert']['title'] == 'doe'
+    assert payload['alert']['subtitle'] == '#example'
+    assert payload['alert']['body'] == 'Hello World'
+    assert payload['badge'] == 1
+    assert payload['sound'] == 'default'
 
 
 def test_push_with_subscription_uri_with_low_urgency(
