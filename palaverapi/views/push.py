@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Optional
+from urllib.parse import urlparse
 
 import peewee
 import redis
@@ -16,8 +17,8 @@ from palaverapi.responses import ProblemResponse
 from palaverapi.utils import send_notification
 from palaverapi.views.mixins import PermissionRequiredMixin
 
-redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-redis_client = redis.from_url(redis_url)
+url = urlparse(os.getenv('REDIS_URL', 'redis://localhost:6379'))
+redis_client = redis.Redis(host=url.hostname, port=url.port, password=url.password, ssl=(url.scheme == "rediss"), ssl_cert_reqs=None)
 queue = Queue(connection=redis_client)
 
 
