@@ -4,7 +4,7 @@ jobs:
   test:
     working_directory: ~/api.palaverapp.com
     docker:
-      - image: circleci/python:3.9.5
+      - image: circleci/python:3.12.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
